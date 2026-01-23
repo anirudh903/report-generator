@@ -7,9 +7,25 @@ from main import generate_report, generate_report_from_df
 # Page Config
 st.set_page_config(page_title="Kychens Report Generator", page_icon="🍳", layout="wide")
 
-# Sync secrets to environment variables
-if "GEMINI_API_KEY" in st.secrets:
-    os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+# --- Cloud Doctor: Safety Checks ---
+SECRET_CHECK = True
+try:
+    if "GEMINI_API_KEY" in st.secrets:
+        os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+    else:
+        SECRET_CHECK = False
+except Exception:
+    SECRET_CHECK = False
+
+if not SECRET_CHECK:
+    st.error("🔑 **Required Setup: Secrets Missing**")
+    st.info("""
+    To run this app in the cloud, you must add your API keys to the Streamlit Secret Dashboard:
+    1. Go to your **Streamlit App Dashboard**.
+    2. Click **Settings** > **Secrets**.
+    3. Paste your `GEMINI_API_KEY` and `GCP_JSON` from your local `secrets.toml`.
+    """)
+    st.stop()
 
 # Custom Styling
 st.markdown("""
