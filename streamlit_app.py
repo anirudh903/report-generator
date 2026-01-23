@@ -48,7 +48,13 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🍳 Kychens Report Generator")
+# App Header
+col_logo, col_text = st.columns([1, 6])
+with col_logo:
+    if os.path.exists("streamlit_logo.png"):
+        st.image("streamlit_logo.png", width=100)
+with col_text:
+    st.title("KYtchens report generator")
 st.subheader("Professional AI-Powered Report Portal")
 
 # Sidebar for Settings
