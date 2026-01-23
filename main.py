@@ -216,24 +216,32 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
         date=datetime.date.today().strftime("%B %d, %Y")
     )
     
-    # Path detection for wkhtmltopdf on Windows
+    # Path detection for wkhtmltopdf (Windows and Linux)
     config = None
-    possible_paths = [
-        r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe',
-        r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe',
-        os.path.expandvars(r'%LOCALAPPDATA%\bin\wkhtmltopdf.exe')
-    ]
+    import shutil
     
-    for path in possible_paths:
-        if os.path.exists(path):
-            config = pdfkit.configuration(wkhtmltopdf=path)
-            break
+    # Try system PATH first
+    system_path = shutil.which("wkhtmltopdf")
+    if system_path:
+        config = pdfkit.configuration(wkhtmltopdf=system_path)
+    else:
+        # Fallback to common hardcoded paths
+        possible_paths = [
+            r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe',
+            r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe',
+            r'/usr/bin/wkhtmltopdf',
+            r'/usr/local/bin/wkhtmltopdf'
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                config = pdfkit.configuration(wkhtmltopdf=path)
+                break
             
     try:
         pdf = pdfkit.from_string(html_out, False, configuration=config)
     except Exception as e:
         if "No wkhtmltopdf executable found" in str(e):
-            raise RuntimeError("PDF Error: wkhtmltopdf is not installed. Please run 'winget install wkhtmltopdf' in your terminal and restart the app.")
+            raise RuntimeError("PDF Error: wkhtmltopdf is not installed correctly in the cloud environment.")
         raise e
         
     return pdf, manager_email
