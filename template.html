@@ -25,20 +25,22 @@
             background-color: var(--background);
             color: var(--text-main);
             margin: 0;
-            padding: 60px 50px;
-            /* Increased outer padding */
+            padding: 10px;
+            /* Minimal padding for edge-to-edge look */
             line-height: 1.6;
         }
 
         .container {
-            max-width: 850px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            /* Stretch to end-to-end */
+            margin: 0;
             background: var(--card-bg);
-            padding: 60px;
-            /* Increased internal padding */
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eef2f6;
+            padding: 40px;
+            border-radius: 0;
+            /* Boxy look for full page immersion */
+            box-shadow: none;
+            border: none;
         }
 
         .header {
