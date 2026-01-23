@@ -237,8 +237,19 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
                 config = pdfkit.configuration(wkhtmltopdf=path)
                 break
             
+    options = {
+        'page-size': 'A4',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'enable-local-file-access': None,
+        'no-outline': None
+    }
+    
     try:
-        pdf = pdfkit.from_string(html_out, False, configuration=config)
+        pdf = pdfkit.from_string(html_out, False, configuration=config, options=options)
     except Exception as e:
         if "No wkhtmltopdf executable found" in str(e):
             raise RuntimeError("PDF Error: wkhtmltopdf is not installed correctly in the cloud environment.")
