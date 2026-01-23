@@ -1,0 +1,51 @@
+name: Weekly Auto-Email
+on:
+  schedule:
+    - cron: '0 8 * * 1' # Monday 8:00 AM
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  auto-send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wkhtmltopdf
+          
+      - name: Install Python Dependencies
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Run Auto Script
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          GCP_JSON: ${{ secrets.GCP_JSON }}
+        run: |
+          python - <<EOF
+          import json
+          import os
+          from main import generate_report, send_email
+
+          try:
+              creds_json = os.getenv('GCP_JSON')
+              if not creds_json:
+                  raise ValueError("GCP_JSON environment variable is empty")
+              
+              creds = json.loads(creds_json)
+              # Example for Burger King Mumbai
+              pdf, mail = generate_report('Burger King', 'Mumbai', creds)
+              send_email(pdf, mail, 'Burger King')
+              print(f'Email sent successfully to {mail}')
+          except Exception as e:
+              print(f'Failed to send email: {e}')
+              exit(1)
+          EOF

@@ -1,0 +1,8 @@
+gspread
+pdfkit
+jinja2
+oauth2client
+pandas
+streamlit
+openpyxl
+google-generativeai
