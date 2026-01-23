@@ -250,6 +250,15 @@ def generate_report(brand, location, creds_dict, sheet_identifier="Kitchen_Data"
     """
     Fetches data from Google Sheets (by Name, ID, or URL) and calls generate_report_from_df.
     """
+    # Cloud Resiliency: Handle potential string-pasting issues
+    if isinstance(creds_dict, str):
+        try:
+            # Fix potential double-escaping from copy-pasting
+            clean_json = creds_dict.replace('\\\\', '\\')
+            creds_dict = json.loads(clean_json)
+        except Exception as e:
+            raise ValueError(f"Failed to parse Google Credentials JSON. Please check your secrets formatting. Error: {e}")
+
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
