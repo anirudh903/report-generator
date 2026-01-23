@@ -54,7 +54,7 @@ with col_logo:
     if os.path.exists("streamlit_logo.png"):
         st.image("streamlit_logo.png", width=100)
 with col_text:
-    st.title("KYtchens report generator")
+    st.title("Kytchens report generator")
 st.subheader("Professional AI-Powered Report Portal")
 
 # Sidebar for Settings
@@ -93,11 +93,68 @@ else:  # Google Sheets Mode
 
 # Report Generation Section
 st.divider()
+
+current_brands = []
+current_locations = []
+
+if mode == "🌐 Google Sheets" and sheet_link:
+    try:
+        with st.spinner("Fetching available brands and locations..."):
+            scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+            from oauth2client.service_account import ServiceAccountCredentials
+            import gspread
+            creds_obj = ServiceAccountCredentials.from_json_keyfile_dict(creds, scope)
+            client = gspread.authorize(creds_obj)
+            
+            # Use same logic as main.py for sheet finding
+            try:
+                if "docs.google.com/spreadsheets" in sheet_link:
+                    sheet = client.open_by_url(sheet_link).get_worksheet(0)
+                else:
+                    sheet = client.open(sheet_link).get_worksheet(0)
+            except:
+                st.error("Could not access the Google Sheet. Please check the URL and sharing permissions.")
+                st.stop()
+                
+            df = pd.DataFrame(sheet.get_all_records())
+            # Clean columns
+            df.columns = [str(c).strip() for c in df.columns]
+            brand_col = next((c for c in df.columns if c.lower() in ['brand', 'brand name', 'company', 'restaurant']), None)
+            loc_col = next((c for c in df.columns if c.lower() in ['location', 'store', 'outlet', 'city', 'area']), None)
+            
+            if brand_col and loc_col:
+                current_brands = sorted([str(b).strip() for b in df[brand_col].unique() if b])
+                current_locations = sorted([str(l).strip() for l in df[loc_col].unique() if l])
+    except Exception as e:
+        st.error(f"Error connecting to Google Sheets: {e}")
+
+elif mode == "📁 Upload Excel/CSV" and df is not None:
+    # Clean columns
+    df.columns = [str(c).strip() for c in df.columns]
+    brand_col = next((c for c in df.columns if c.lower() in ['brand', 'brand name', 'company', 'restaurant']), None)
+    loc_col = next((c for c in df.columns if c.lower() in ['location', 'store', 'outlet', 'city', 'area']), None)
+    
+    if brand_col and loc_col:
+        current_brands = sorted([str(b).strip() for b in df[brand_col].unique() if b])
+        current_locations = sorted([str(l).strip() for l in df[loc_col].unique() if l])
+
 col1, col2 = st.columns(2)
 with col1:
-    brand = st.text_input("Brand Name", placeholder="e.g., Burger King")
+    if current_brands:
+        brand = st.selectbox("Select Brand", options=current_brands)
+    else:
+        brand = st.text_input("Brand Name", placeholder="Upload data to see list", disabled=True)
 with col2:
-    location = st.text_input("Location", placeholder="e.g., Mumbai")
+    if current_locations and brand:
+        # Show only locations available for the selected brand
+        if brand_col and loc_col:
+            brand_mask = df[brand_col].astype(str).str.strip() == brand
+            relevant_locs = sorted([str(l).strip() for l in df[brand_mask][loc_col].unique() if l])
+            location = st.selectbox("Select Location", options=relevant_locs)
+        else:
+            location = st.selectbox("Select Location", options=current_locations)
+    else:
+        location = st.text_input("Location", placeholder="Select brand first", disabled=True)
 
 if st.button("🚀 Generate & Download Report"):
     if not brand or not location:
