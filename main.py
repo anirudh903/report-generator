@@ -257,34 +257,34 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
         
     return pdf, manager_email
 
-def generate_report(brand, location, creds_dict, sheet_identifier="Kitchen_Data", logo_b64=None):
+def generate_report(brand, location, creds_dict, sheet_identifier=None, logo_b64=None):
     """
-    Fetches data from Google Sheets (by Name, ID, or URL) and calls generate_report_from_df.
+    Fetches data from Google Sheets and calls generate_report_from_df.
+    Supports Name, URL, or from secrets identifier.
     """
     # Cloud Resiliency: Handle potential string-pasting issues
     if isinstance(creds_dict, str):
         try:
-            # Fix potential double-escaping from copy-pasting
             clean_json = creds_dict.replace('\\\\', '\\')
             creds_dict = json.loads(clean_json)
         except Exception as e:
-            raise ValueError(f"Failed to parse Google Credentials JSON. Please check your secrets formatting. Error: {e}")
+            raise ValueError(f"Failed to parse Credentials JSON. Error: {e}")
+
+    # Use sheet_identifier if provided, else check for spreadsheet key in dictionary (Common in st.connection)
+    if not sheet_identifier:
+        sheet_identifier = creds_dict.get('spreadsheet', "Kitchen_Data")
 
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
     
     try:
-        if "docs.google.com/spreadsheets" in sheet_identifier:
-            sheet = client.open_by_url(sheet_identifier).worksheet("Data")
-        else:
-            sheet = client.open(sheet_identifier).worksheet("Data")
-    except Exception:
-        # Fallback to first worksheet if "Data" doesn't exist
-        if "docs.google.com/spreadsheets" in sheet_identifier:
+        if "docs.google.com/spreadsheets" in str(sheet_identifier):
             sheet = client.open_by_url(sheet_identifier).get_worksheet(0)
         else:
             sheet = client.open(sheet_identifier).get_worksheet(0)
+    except Exception as e:
+        raise ValueError(f"Could not open spreadsheet '{sheet_identifier}'. Error: {e}")
             
     df = pd.DataFrame(sheet.get_all_records())
     
