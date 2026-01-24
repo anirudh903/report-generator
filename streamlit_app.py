@@ -85,17 +85,24 @@ else:  # Google Sheets Mode
     
     if sheet_url:
         try:
-            # Using the new GSheetsConnection as requested
-            conn = st.connection("gsheets", type=GSheetsConnection)
+            # --- CONNECTION HEALING ---
+            # Streamlit Community Cloud sometimes double-escapes common keys. Let's fix it manually.
+            g_creds = dict(st.secrets["connections"]["gsheets"])
+            if "private_key" in g_creds:
+                # Ensure literal newlines are correctly formatted
+                g_creds["private_key"] = g_creds["private_key"].replace("\\n", "\n")
+            
+            conn = st.connection("gsheets", type=GSheetsConnection, **g_creds)
+            # --------------------------
+            
             with st.spinner("Connecting to Google Sheets..."):
-                # Pass the spreadsheet URL directly
                 df = conn.read(spreadsheet=sheet_url, ttl=0)
             st.success("Connected to Google Sheets!")
             if st.checkbox("Show Sheet Data Preview"):
                 st.dataframe(df.head(), use_container_width=True)
         except Exception as e:
             st.error(f"Error connecting to Google Sheets: {e}")
-            st.info("Ensure you have set up the Google Service Account JSON in your secrets.")
+            st.warning("⚠️ **Tip:** This '401 Unauthorized' usually means the Google Service Account doesn't have access to your sheet. Share your sheet with the client_email found in your JSON key.")
     else:
         st.warning("Please paste a Google Sheet URL to proceed.")
 
