@@ -2,8 +2,9 @@ import streamlit as st
 import json
 import pandas as pd
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from main import generate_report_from_df
-from streamlit_gsheets import GSheetsConnection
 
 # Page Config
 st.set_page_config(page_title="Kytchens Report Generator", page_icon="🍳", layout="wide")
@@ -20,32 +21,14 @@ except Exception:
 
 if not SECRET_CHECK:
     st.error("🔑 **Required Setup: Secrets Missing**")
-    st.info("""
-    To run this app in the cloud, you must add your API keys to the Streamlit Secret Dashboard:
-    1. Go to your **Streamlit App Dashboard**.
-    2. Click **Settings** > **Secrets**.
-    3. Paste your `GEMINI_API_KEY` and `GCP_JSON` (or the new [connections.gsheets] format) from your local `secrets.toml`.
-    """)
+    st.info("Please add your API keys to the Streamlit Secrets Dashboard.")
     st.stop()
 
 # Custom Styling
 st.markdown("""
     <style>
     .main { background-color: #f8fafc; }
-    .stButton>button {
-        width: 100%;
-        border-radius: 12px;
-        height: 3em;
-        background-color: #6366f1;
-        color: white;
-        font-weight: bold;
-    }
-    .upload-section {
-        border: 2px dashed #6366f1;
-        padding: 20px;
-        border-radius: 15px;
-        background-color: #f0f7ff;
-    }
+    .stButton>button { width: 100%; border-radius: 12px; height: 3em; background-color: #6366f1; color: white; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -65,93 +48,69 @@ mode = st.sidebar.radio("Data Source", ["📁 Upload Excel/CSV", "🌐 Google Sh
 df = None
 
 if mode == "📁 Upload Excel/CSV":
-    st.info("Upload an Excel or CSV file with columns: Brand, Location, Orders, Errors, KPT, Manager_Email")
     uploaded_file = st.file_uploader("Choose a file", type=["xlsx", "csv"])
     if uploaded_file:
         try:
-            if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
-            else:
-                df = pd.read_excel(uploaded_file)
-            st.success("File uploaded successfully!")
+            df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
+            st.success("File uploaded!")
         except Exception as e:
-            st.error(f"Error reading file: {e}")
+            st.error(f"Error: {e}")
 
 else:  # Google Sheets Mode
-    st.info("🔗 Provide your Google Sheet URL. Note: The Service Account must have access to the sheet.")
-    sheet_url = st.text_input("Google Sheet URL", 
-                             placeholder="https://docs.google.com/spreadsheets/d/...",
-                             value=st.secrets.get("connections", {}).get("gsheets", {}).get("spreadsheet", ""))
+    sheet_url = st.text_input("Google Sheet URL", placeholder="https://docs.google.com/spreadsheets/d/...")
     
     if sheet_url:
         try:
-            # --- CONNECTION HEALING ---
-            # Streamlit Community Cloud sometimes double-escapes common keys. Let's fix it manually.
-            g_creds = dict(st.secrets["connections"]["gsheets"])
-            if "private_key" in g_creds:
-                # Ensure literal newlines are correctly formatted
-                g_creds["private_key"] = g_creds["private_key"].replace("\\n", "\n")
+            # 1. Get raw creds from secrets
+            # We try both the new flattened format and the old GCP_JSON format
+            if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
+                creds_dict = dict(st.secrets["connections"]["gsheets"])
+            elif "GCP_JSON" in st.secrets:
+                creds_dict = json.loads(st.secrets["GCP_JSON"])
+            else:
+                st.error("GCP credentials not found in secrets.")
+                st.stop()
             
-            conn = st.connection("gsheets", type=GSheetsConnection, **g_creds)
-            # --------------------------
+            # 2. Fix private key formatting
+            if "private_key" in creds_dict:
+                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
             
-            with st.spinner("Connecting to Google Sheets..."):
-                df = conn.read(spreadsheet=sheet_url, ttl=0)
+            # 3. Connect via gspread (More reliable than the st-gsheets-connection for some keys)
+            scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            client = gspread.authorize(creds)
+            
+            with st.spinner("Connecting..."):
+                sheet = client.open_by_url(sheet_url).get_worksheet(0)
+                df = pd.DataFrame(sheet.get_all_records())
             st.success("Connected to Google Sheets!")
-            if st.checkbox("Show Sheet Data Preview"):
-                st.dataframe(df.head(), use_container_width=True)
         except Exception as e:
-            st.error(f"Error connecting to Google Sheets: {e}")
-            st.warning("⚠️ **Tip:** This '401 Unauthorized' usually means the Google Service Account doesn't have access to your sheet. Share your sheet with the client_email found in your JSON key.")
-    else:
-        st.warning("Please paste a Google Sheet URL to proceed.")
+            st.error(f"Connection Failed: {e}")
+            st.info("💡 **Common Fix:** Share your sheet with: " + creds_dict.get('client_email', 'the email in your JSON'))
 
-# Report Generation Section
+# Report Generation
 st.divider()
-
-current_brands = []
-current_locations = []
-
 if df is not None:
-    # Clean the DataFrame columns for consistent matching
     df.columns = [str(c).strip() for c in df.columns]
-    
-    # Identify key columns using the same logic as main.py
     brand_col = next((c for c in df.columns if c.lower() in ['brand', 'brand name', 'company', 'restaurant']), None)
     loc_col = next((c for c in df.columns if c.lower() in ['location', 'store', 'outlet', 'city', 'area']), None)
     
     if brand_col and loc_col:
         current_brands = sorted([str(b).strip() for b in df[brand_col].unique() if b])
-        
         col1, col2 = st.columns(2)
-        with col1:
-            brand = st.selectbox("Select Brand", options=current_brands)
+        with col1: brand = st.selectbox("Select Brand", options=current_brands)
         with col2:
-            if brand:
-                brand_mask = df[brand_col].astype(str).str.strip() == brand
-                relevant_locs = sorted([str(l).strip() for l in df[brand_mask][loc_col].unique() if l])
-                location = st.selectbox("Select Location", options=relevant_locs)
-            else:
-                location = st.selectbox("Select Location", options=[], disabled=True)
+            brand_mask = df[brand_col].astype(str).str.strip() == brand
+            relevant_locs = sorted([str(l).strip() for l in df[brand_mask][loc_col].unique() if l])
+            location = st.selectbox("Select Location", options=relevant_locs)
                 
         if st.button("🚀 Generate & Download Report"):
             try:
-                with st.spinner("Generating report..."):
-                    pdf, email = generate_report_from_df(df, brand, location)
-                    
-                    st.success(f"Report generated! Send to: {email}")
-                    st.download_button(
-                        label="📥 Download PDF Report",
-                        data=pdf,
-                        file_name=f"{brand}_{location}_report.pdf",
-                        mime="application/pdf"
-                    )
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
-    else:
-        st.warning(f"Could not find Brand or Location columns in the data. Found: {list(df.columns)}")
-else:
-    st.info("Please provide a data source (Upload or Google Sheets) to begin.")
+                pdf, email = generate_report_from_df(df, brand, location)
+                st.success(f"Generated! Sent to: {email}")
+                st.download_button("📥 Download PDF", data=pdf, file_name=f"{brand}_{location}.pdf", mime="application/pdf")
+            except Exception as e: st.error(f"Error: {e}")
+    else: st.warning(f"Could not find Brand/Location columns.")
+else: st.info("Please provide a data source to begin.")
 
-st.divider()
-st.caption("Kychens Intelligence System v1.2 • Powered by Streamlit & Gemini")
+st.caption("Kychens Intelligence System v1.3")
