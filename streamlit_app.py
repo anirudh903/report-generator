@@ -78,17 +78,26 @@ if mode == "📁 Upload Excel/CSV":
             st.error(f"Error reading file: {e}")
 
 else:  # Google Sheets Mode
-    try:
-        # Using the new GSheetsConnection as requested
-        conn = st.connection("gsheets", type=GSheetsConnection)
-        with st.spinner("Connecting to Google Sheets..."):
-            df = conn.read(ttl=0)
-        st.success("Connected to Google Sheets!")
-        if st.checkbox("Show Sheet Data Preview"):
-            st.dataframe(df.head(), use_container_width=True)
-    except Exception as e:
-        st.error(f"Error connecting to Google Sheets: {e}")
-        st.info("Ensure you have set up [connections.gsheets] in your secrets.")
+    st.info("🔗 Provide your Google Sheet URL. Note: The Service Account must have access to the sheet.")
+    sheet_url = st.text_input("Google Sheet URL", 
+                             placeholder="https://docs.google.com/spreadsheets/d/...",
+                             value=st.secrets.get("connections", {}).get("gsheets", {}).get("spreadsheet", ""))
+    
+    if sheet_url:
+        try:
+            # Using the new GSheetsConnection as requested
+            conn = st.connection("gsheets", type=GSheetsConnection)
+            with st.spinner("Connecting to Google Sheets..."):
+                # Pass the spreadsheet URL directly
+                df = conn.read(spreadsheet=sheet_url, ttl=0)
+            st.success("Connected to Google Sheets!")
+            if st.checkbox("Show Sheet Data Preview"):
+                st.dataframe(df.head(), use_container_width=True)
+        except Exception as e:
+            st.error(f"Error connecting to Google Sheets: {e}")
+            st.info("Ensure you have set up the Google Service Account JSON in your secrets.")
+    else:
+        st.warning("Please paste a Google Sheet URL to proceed.")
 
 # Report Generation Section
 st.divider()
