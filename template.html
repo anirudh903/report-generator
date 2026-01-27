@@ -3,148 +3,88 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Executive Performance Audit</title>
     <style>
         :root {
-            --navy: #0a192f;
-            --slate-700: #334155;
-            --slate-500: #64748b;
-            --slate-200: #e2e8f0;
-            --slate-50: #f8fafc;
-            --success: #059669;
+            --slate-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
             --danger: #ef4444;
-            --white: #ffffff;
         }
 
         body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            margin: 0;
-            padding: 60px 40px;
-            color: var(--navy);
-            background-color: var(--white);
-            line-height: 1.5;
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 40px;
+            background-color: #ffffff;
+            color: var(--text-main);
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
-        /* 1. HERO LOGO SECTION */
         .hero-branding {
             text-align: center;
             margin-bottom: 30px;
         }
 
         .hero-branding img {
-            max-height: 160px;
+            max-height: 150px;
             width: auto;
             display: inline-block;
         }
 
-        /* 2. TOP METADATA BAR */
-        .meta-container {
-            border-bottom: 3px solid var(--navy);
-            padding-bottom: 2px;
-            margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-        }
-
-        .meta-item {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--navy);
-        }
-
-        .meta-id {
-            color: var(--slate-500);
-        }
-
-        /* 3. PRIMARY HEADER */
-        .main-header {
-            margin-bottom: 49px;
-        }
-
-        .main-header h1 {
-            font-size: 38px;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: -0.03em;
-            color: var(--navy);
-        }
-
-        .main-header p {
-            font-size: 15px;
-            color: var(--slate-500);
-            margin: 8px 0 0 0;
-            font-weight: 400;
-        }
-
-        /* 4. PERFORMANCE GRIID */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 100px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background-color: var(--slate-50);
-            padding: 20px;
-            border-radius: 50px;
-            border-bottom: 2px solid var(--slate-200);
-        }
-
-        .stat-label {
-            display: block;
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--slate-500);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
+        .report-title {
             font-size: 24px;
             font-weight: 800;
-            color: var(--navy);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 5px solid var(--text-main);
+            padding-left: 15px;
         }
 
-        .stat-value.success {
+        /* The row container that creates the 'gap' */
+        .metric-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 80px;
+            padding: 0 30px;
+            margin-bottom: 15px;
+            /* THIS CREATES THE GAP */
+            border: 1px solid var(--slate-border);
+            border-radius: 50px;
+            /* Creates the rounded pill look */
+            background: #fff;
+        }
+
+        .label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Section Spacing */
+        .section-break {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--slate-border);
+        }
+
+        .color-success {
             color: var(--success);
         }
 
-        .stat-value.danger {
+        .color-danger {
             color: var(--danger);
-        }
-
-        /* 6. SYSTEM FOOTER */
-        footer {
-            margin-top: 80px;
-            padding-top: 25px;
-            border-top: 1px solid var(--slate-200);
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            color: var(--slate-500);
-            font-weight: 500;
-        }
-
-        .confidential {
-            color: var(--danger);
-            font-weight: 700;
-        }
-
-        @media print {
-            body {
-                padding: 30px;
-            }
-
-            .stat-card {
-                border: 1px solid #ddd;
-            }
         }
     </style>
 </head>
@@ -158,64 +98,40 @@
     </div>
     {% endif %}
 
-    <!-- METADATA BAR -->
-    <div class="meta-container">
-        <div class="meta-item">Operations Intelligence Portal</div>
-        <div class="meta-item meta-id">Reference: {{ brand[:3].upper() }}-2026 // Audit Verified</div>
+    <div class="report-title">{{ brand }} <br><span style="font-size: 14px; font-weight: 400;">{{ location }} Audit
+            Report</span></div>
+
+    <div class="metric-row">
+        <span class="label">Order Volume</span>
+        <span class="value">{{ orders }}</span>
     </div>
 
-    <!-- HEADER -->
-    <header class="main-header">
-        <h1>{{ brand }}</h1>
-        <p>{{ location }} · Operational Integrity Update · {{ date }}</p>
-    </header>
-
-    <!-- KPI GRID 1 -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label">Order Volume</span>
-            <span class="stat-value">{{ orders }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Efficiency Rate</span>
-            <span class="stat-value success">{{ 100 - error_pct }}%</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Average Prep Time</span>
-            <span class="stat-value">{{ kpt }}m</span>
-        </div>
+    <div class="metric-row">
+        <span class="label">Efficiency Rate</span>
+        <span class="value color-success">{{ 100 - error_pct }}%</span>
     </div>
 
-    <!-- KPI GRID 2 -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label">Kitchen Errors</span>
-            <span class="stat-value {% if kitchen_errors > 5 %}danger{% endif %}">{{ kitchen_errors }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">MFR Cancellations</span>
-            <span class="stat-value {% if mfr_cancellations > 2 %}danger{% endif %}">{{ mfr_cancellations }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">MFR Errors</span>
-            <span class="stat-value {% if mfr_errors > 2 %}danger{% endif %}">{{ mfr_errors }}</span>
-        </div>
+    <div class="metric-row">
+        <span class="label">Average Prep Time</span>
+        <span class="value">{{ kpt }}m</span>
     </div>
 
-    <!-- KPI GRID 3 (Status) -->
-    <div class="stats-grid">
-        <div class="stat-card" style="grid-column: span 3; background-color: var(--navy); border-bottom: none;">
-            <span class="stat-label" style="color: rgba(255,255,255,0.6);">Overall Performance Rating</span>
-            <span class="stat-value" style="color: white;">OPTIMAL // VERIFIED OPERATIONAL STANDARD</span>
-        </div>
+    <div class="section-break"></div>
+
+    <div class="metric-row">
+        <span class="label">Kitchen Errors</span>
+        <span class="value color-danger">{{ kitchen_errors }}</span>
     </div>
 
-    <!-- FOOTER -->
-    <footer>
-        <div>Generated by Kytchens Intelligence Systems &bull; Global Operations</div>
-        <div class="confidential">INTERNAL PROPERTY &bull; HIGHLY CONFIDENTIAL</div>
-        <div>Page 1 of 1</div>
-    </footer>
+    <div class="metric-row">
+        <span class="label">MFR Cancellations</span>
+        <span class="value color-danger">{{ mfr_cancellations }}</span>
+    </div>
+
+    <div class="metric-row">
+        <span class="label">MFR Errors</span>
+        <span class="value">{{ mfr_errors }}</span>
+    </div>
 
 </body>
 
