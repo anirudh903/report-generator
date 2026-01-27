@@ -7,205 +7,268 @@
     <style>
         :root {
             --navy: #0a192f;
-            --slate: #475569;
-            --line: #e2e8f0;
-            --bg: #ffffff;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-50: #f8fafc;
+            --success: #059669;
+            --white: #ffffff;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
             margin: 0;
-            padding: 50px;
+            padding: 60px 50px;
             color: var(--navy);
-            line-height: 1.4;
+            background-color: var(--white);
+            line-height: 1.5;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
-        /* 1. TOP NAVIGATION / METADATA */
-        .top-meta {
+        /* 1. HERO LOGO SECTION */
+        .hero-branding {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-branding img {
+            max-height: 180px;
+            width: auto;
+            display: inline-block;
+        }
+
+        /* 2. TOP METADATA BAR */
+        .meta-container {
+            border-bottom: 1px solid var(--navy);
+            padding-bottom: 12px;
+            margin-bottom: 50px;
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            align-items: baseline;
+        }
+
+        .meta-item {
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 2px solid var(--navy);
-            padding-bottom: 8px;
-            margin-bottom: 40px;
+            letter-spacing: 0.1em;
+            color: var(--navy);
         }
 
-        /* 2. BRAND HEADER */
-        header {
-            margin-bottom: 60px;
+        .meta-id {
+            color: var(--slate-500);
         }
 
-        .logo-box img {
-            max-height: 50px;
-            margin-bottom: 15px;
-            display: block;
+        /* 3. PRIMARY HEADER */
+        .main-header {
+            margin-bottom: 50px;
         }
 
-        header h1 {
-            font-size: 38px;
+        .main-header h1 {
+            font-size: 42px;
             font-weight: 800;
             margin: 0;
-            letter-spacing: -1px;
+            letter-spacing: -0.03em;
+            color: var(--navy);
         }
 
-        header p {
-            font-size: 14px;
-            color: var(--slate);
-            margin: 5px 0 0 0;
+        .main-header p {
+            font-size: 16px;
+            color: var(--slate-500);
+            margin: 8px 0 0 0;
+            font-weight: 400;
         }
 
-        /* 3. STRUCTURED KPI GRID */
-        .kpi-row {
+        /* 4. STATISTICAL KPI GRID */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 24px;
+            margin-bottom: 70px;
+        }
+
+        .stat-card {
+            background-color: var(--slate-50);
+            padding: 24px 20px;
+            border-radius: 8px;
+            border-bottom: 3px solid var(--slate-200);
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .stat-value.highlight {
+            color: var(--success);
+        }
+
+        /* 5. DATA BREAKDOWN TABLE */
+        .table-section {
             margin-bottom: 60px;
         }
 
-        .kpi-card {
-            border-left: 1px solid var(--line);
-            padding-left: 15px;
-        }
-
-        .label {
-            display: block;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--slate);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        /* 4. DATA SECTION TABLE */
-        .section-title {
-            font-size: 12px;
+        .section-header {
+            font-size: 13px;
             font-weight: 800;
             text-transform: uppercase;
-            background: #f8fafc;
-            padding: 8px 12px;
+            letter-spacing: 0.05em;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--navy);
             margin-bottom: 20px;
-            border-left: 3px solid var(--navy);
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 40px;
         }
 
         .data-table th {
             text-align: left;
             font-size: 11px;
-            color: var(--slate);
-            border-bottom: 1px solid var(--navy);
-            padding: 10px;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            padding: 15px 10px;
+            background-color: var(--slate-50);
+            border-bottom: 1px solid var(--line);
         }
 
         .data-table td {
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--line);
-            font-size: 13px;
+            padding: 18px 10px;
+            border-bottom: 1px solid var(--slate-200);
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        /* 5. FOOTER */
+        .benchmark-tag {
+            font-size: 11px;
+            color: var(--slate-500);
+            font-style: italic;
+        }
+
+        /* 6. SYSTEM FOOTER */
         footer {
-            margin-top: 80px;
-            padding-top: 20px;
-            border-top: 1px solid var(--line);
-            font-size: 10px;
-            color: var(--slate);
+            margin-top: 100px;
+            padding-top: 30px;
+            border-top: 1px solid var(--slate-200);
             display: flex;
             justify-content: space-between;
+            font-size: 10px;
+            color: var(--slate-500);
+            font-weight: 500;
+        }
+
+        .confidential {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        @media print {
+            body {
+                padding: 40px;
+            }
+
+            .stat-card {
+                border: 1px solid #ccc;
+            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- HERO LOGO -->
     {% if logo_b64 %}
-    <div style="text-align: center; margin-bottom: 50px;">
-        <img src="data:image/png;base64,{{ logo_b64 }}" style="max-height: 180px; width: auto; display: inline-block;">
+    <div class="hero-branding">
+        <img src="data:image/png;base64,{{ logo_b64 }}" alt="Enterprise Logo">
     </div>
     {% endif %}
 
-    <div class="top-meta">
-        <span>Performance Review</span>
-        <span>Confidential / Internal Use</span>
-        <span>ID: {{ brand[:3].upper() }}-2026</span>
+    <!-- METADATA BAR -->
+    <div class="meta-container">
+        <div class="meta-item">Operations Intelligence Portal</div>
+        <div class="meta-item meta-id">Audit ID: {{ brand[:3].upper() }}-2026-{{ range(1001, 9999) | random }}</div>
     </div>
 
-    <header>
+    <!-- HEADER -->
+    <header class="main-header">
         <h1>{{ brand }}</h1>
-        <p>{{ location }} · Operational Audit Update · {{ date }}</p>
+        <p>{{ location }} Hub &bull; Performance Audit Update &bull; {{ date }}</p>
     </header>
 
-    <div class="kpi-row">
-        <div class="kpi-card">
-            <span class="label">Total Orders</span>
-            <span class="value">{{ orders }}</span>
+    <!-- KPI TILES -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Total Volume</span>
+            <span class="stat-value">{{ orders }}</span>
         </div>
-        <div class="kpi-card">
-            <span class="label">Efficiency</span>
-            <span class="value">{{ 100 - error_pct }}%</span>
+        <div class="stat-card">
+            <span class="stat-label">Efficiency</span>
+            <span class="stat-value">{{ 100 - error_pct }}%</span>
         </div>
-        <div class="kpi-card">
-            <span class="label">Avg Prep Time</span>
-            <span class="value">{{ kpt }}m</span>
+        <div class="stat-card">
+            <span class="stat-label">Avg Prep Time</span>
+            <span class="stat-value">{{ kpt }}m</span>
         </div>
-        <div class="kpi-card">
-            <span class="label">Status</span>
-            <span class="value" style="color: #059669;">Optimal</span>
+        <div class="stat-card">
+            <span class="stat-label">Category Status</span>
+            <span class="stat-value highlight">Optimal</span>
         </div>
     </div>
 
-    <div class="section-title">Operational Breakdown</div>
+    <!-- TABLE SECTION -->
+    <div class="table-section">
+        <div class="section-header">Detailed Operational Breakdown</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>KPI Description</th>
+                    <th>Metric Result</th>
+                    <th>Benchmark</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Accuracy</td>
+                    <td>Internal Kitchen Errors</td>
+                    <td>{{ kitchen_errors }}</td>
+                    <td class="benchmark-tag">&lt; 5 per cycle</td>
+                </tr>
+                <tr>
+                    <td>Logistics</td>
+                    <td>MFR Origin Cancellations</td>
+                    <td>{{ mfr_cancellations }}</td>
+                    <td class="benchmark-tag">&lt; 2 per cycle</td>
+                </tr>
+                <tr>
+                    <td>Compliance</td>
+                    <td>Registry Verification</td>
+                    <td>PASSED</td>
+                    <td class="benchmark-tag">Mandatory</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Metric Name</th>
-                <th>Result</th>
-                <th>Benchmark</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Accuracy</td>
-                <td>Kitchen Error Count</td>
-                <td>{{ kitchen_errors }}</td>
-                <td>
-                    < 5</td>
-            </tr>
-            <tr>
-                <td>Logistics</td>
-                <td>MFR Cancellations</td>
-                <td>{{ mfr_cancellations }}</td>
-                <td>
-                    < 2</td>
-            </tr>
-            <tr>
-                <td>Service</td>
-                <td>Compliance Check</td>
-                <td>Pass</td>
-                <td>Required</td>
-            </tr>
-        </tbody>
-    </table>
-
+    <!-- FOOTER -->
     <footer>
-        <div>Generated by Kytchens Intelligence System</div>
-        <div>&copy; 2026 Global Ops. Page 1 of 1</div>
+        <div>Generated by Kytchens Intelligence Systems &bull; Global Operations</div>
+        <div class="confidential">INTERNAL PROPERTY &bull; HIGHLY CONFIDENTIAL</div>
+        <div>Page 01 // 01</div>
     </footer>
 
 </body>
