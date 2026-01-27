@@ -98,7 +98,7 @@ def match_input_with_ai(user_input, valid_options, item_type="Brand"):
     except Exception:
         return user_input
 
-def generate_report_from_df(df, brand, location, logo_b64=None):
+def generate_report_from_df(df, brand, location, logo_b64=None, spreadsheet_url=None):
     """
     Renders a PDF report with flexible column finding and robust row matching.
     """
@@ -216,6 +216,7 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
         mfr_errors=mfr_errors,
         k_error_pct=k_error_pct,
         logo_b64=logo_b64,
+        spreadsheet_url=spreadsheet_url,
         published_at=(datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30)).strftime("%B %d, %Y // %I:%M %p IST")
     )
     

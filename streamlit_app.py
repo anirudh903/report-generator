@@ -104,15 +104,13 @@ if df is not None:
             location = st.selectbox("Select Location", options=relevant_locs)
                 
         col_dl, col_em = st.columns(2)
-        
-        pdf_data = None
-        email_addr = None
-        
+        active_url = sheet_url if mode == "🌐 Google Sheets" else None
+
         with col_dl:
             if st.button("🚀 Generate & Download Single Report"):
                 try:
                     with st.spinner("Generating..."):
-                        pdf_data, email_addr = generate_report_from_df(df, brand, location)
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=active_url)
                         st.success(f"Generated!")
                         st.download_button(
                             label="📥 Download PDF",
@@ -127,7 +125,7 @@ if df is not None:
                 try:
                     with st.spinner("Sending email..."):
                         # Always re-generate or fetch to ensure we have latest
-                        pdf_data, email_addr = generate_report_from_df(df, brand, location)
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=active_url)
                         
                         if email_addr and "@" in str(email_addr):
                             success, msg = send_email(pdf_data, email_addr, brand)

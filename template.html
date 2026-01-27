@@ -164,6 +164,9 @@
     <div class="header">
         <div class="brand-name">{{ brand }} // {{ location }}</div>
         <div class="timestamp">Period: {{ published_at }}</div>
+        {% if spreadsheet_url %}<a href="{{ spreadsheet_url }}"
+            style="font-size:10px; color: var(--apple-blue); text-decoration:none; margin-left:10px;">(View
+            Spreadsheet)</a>{% endif %}
     </div>
 
     <div class="bento-stack">
@@ -195,7 +198,12 @@
 
         <div class="bento-item">
             <span class="item-label">Store Cancellations (MFR)</span>
-            <span class="item-value">{{ mfr_cancellations }}</span>
+            <div>
+                <span class="item-value">{{ mfr_cancellations }}</span>
+                {% if spreadsheet_url %}<a href="{{ spreadsheet_url }}"
+                    style="font-size: 11px; margin-left: 10px; color: var(--apple-blue); text-decoration: none;">(View)</a>{%
+                endif %}
+            </div>
         </div>
 
         <div class="bento-item alt">
