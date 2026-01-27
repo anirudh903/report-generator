@@ -4,146 +4,212 @@
 <head>
     <meta charset="UTF-8">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         :root {
-            --slate-border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
+            --apple-black: #1d1d1f;
+            --apple-white: #ffffff;
+            --apple-gray: #f5f5f7;
+            --apple-border: #d2d2d7;
+            --apple-blue: #007aff;
+            --apple-red: #ff3b30;
+            --text-secondary: #86868b;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            padding: 40px;
-            background-color: #ffffff;
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--apple-white);
+            color: var(--apple-black);
+            margin: 0;
+            padding: 60px 50px;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
+        /* --- LOGO SECTION --- */
         .hero-branding {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .hero-branding img {
-            max-height: 150px;
+            max-height: 120px;
             width: auto;
             display: inline-block;
         }
 
-        .report-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-left: 5px solid var(--text-main);
-            padding-left: 15px;
-        }
-
-        /* The row container that creates the 'gap' */
-        .metric-row {
+        .header {
+            margin-bottom: 40px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 80px;
-            padding: 0 30px;
-            margin-bottom: 15px;
-            /* THIS CREATES THE GAP */
-            border: 1px solid var(--slate-border);
-            border-radius: 50px;
-            /* Creates the rounded pill look */
-            background: #fff;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .label {
-            font-size: 10px;
+        .brand-name {
+            font-size: 24px;
             font-weight: 700;
-            color: var(--text-muted);
+            letter-spacing: -0.5px;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* --- THE BENTO STACK --- */
+        .bento-stack {
+            border: 1.5px solid var(--apple-border);
+            border-radius: 30px;
+            overflow: hidden;
+            /* Ensures internal rows respect the corner radius */
+            background: var(--apple-white);
+        }
+
+        /* PRIMARY SEGMENT (KPIs) */
+        .bento-hero {
+            background-color: var(--apple-black);
+            color: var(--apple-white);
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .kpi-box .label {
+            color: #a1a1a6;
+            font-size: 12px;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        .value {
-            font-size: 28px;
+        .kpi-box .value {
+            font-size: 52px;
             font-weight: 700;
-            margin: 0;
+            letter-spacing: -2px;
         }
 
-        /* Section Spacing */
-        .section-break {
-            margin-top: 40px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--slate-border);
+        /* STANDARD SEGMENT */
+        .bento-item {
+            padding: 25px 40px;
+            border-bottom: 1px solid var(--apple-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .color-success {
-            color: var(--success);
+        .bento-item:last-child {
+            border-bottom: none;
         }
 
-        .color-danger {
-            color: var(--danger);
+        .bento-item.alt {
+            background-color: var(--apple-gray);
+        }
+
+        .item-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--apple-black);
+        }
+
+        .item-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--apple-black);
+        }
+
+        .status-pill {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .pill-red {
+            background: #ffebeb;
+            color: var(--apple-red);
+        }
+
+        .pill-blue {
+            background: #eef7ff;
+            color: var(--apple-blue);
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- HERO LOGO -->
+    <!-- HERO LOGO AT THE MIDDLE TOP -->
     {% if logo_b64 %}
     <div class="hero-branding">
         <img src="data:image/png;base64,{{ logo_b64 }}" alt="Enterprise Logo">
     </div>
     {% endif %}
 
-    <!-- METADATA BAR -->
-    <div
-        style="font-size: 9px; font-weight: 700; color: var(--text-muted); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid var(--slate-border); padding-bottom: 5px;">
-        Operations Intelligence Portal Reference: {{ brand[:3].upper() }}-2026 // Audit Verified
+    <div class="header">
+        <div class="brand-name">{{ brand }}</div>
+        <div class="timestamp">Period: {{ published_at }}</div>
     </div>
 
-    <div class="report-title">{{ brand }} <br><span style="font-size: 14px; font-weight: 400;">{{ location }} Audit
-            Report</span></div>
+    <div class="bento-stack">
+        <div class="bento-hero">
+            <div class="kpi-box">
+                <span class="label">Total Orders</span>
+                <span class="value">{{ orders }}</span>
+            </div>
+            <div class="kpi-box" style="text-align: right;">
+                <span class="label">Efficiency</span>
+                <span class="value">{{ 100 - error_pct }}%</span>
+            </div>
+        </div>
 
-    <div class="metric-row">
-        <span class="label">Order Volume</span>
-        <span class="value">{{ orders }}</span>
+        <div class="bento-item">
+            <span class="item-label">Average Preparation Time</span>
+            <span class="item-value">{{ kpt }}m</span>
+        </div>
+
+        <div class="bento-item alt">
+            <span class="item-label">Kitchen Accuracy Errors</span>
+            <div>
+                <span class="item-value">{{ kitchen_errors }}</span>
+                {% if kitchen_errors > 0 %}
+                <span class="status-pill pill-red">Action Required</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bento-item">
+            <span class="item-label">Store Cancellations (MFR)</span>
+            <span class="item-value">{{ mfr_cancellations }}</span>
+        </div>
+
+        <div class="bento-item alt">
+            <span class="item-label">Total System Exceptions</span>
+            <div>
+                <span class="item-value">{{ mfr_errors }}</span>
+                <span class="status-pill pill-blue">Logged</span>
+            </div>
+        </div>
     </div>
 
-    <div class="metric-row">
-        <span class="label">Efficiency Rate</span>
-        <span class="value color-success">{{ 100 - error_pct }}%</span>
+    <div class="footer">
+        PROPRIETARY DATA • KYTCHENS INTELLIGENCE UNIT • AUDIT REF: {{ brand[:3].upper() }}-26
     </div>
-
-    <div class="metric-row">
-        <span class="label">Average Prep Time</span>
-        <span class="value">{{ kpt }}m</span>
-    </div>
-
-    <div class="section-break"></div>
-
-    <div class="metric-row">
-        <span class="label">Kitchen Errors</span>
-        <span class="value color-danger">{{ kitchen_errors }}</span>
-    </div>
-
-    <div class="metric-row">
-        <span class="label">MFR Cancellations</span>
-        <span class="value color-danger">{{ mfr_cancellations }}</span>
-    </div>
-
-    <div class="metric-row">
-        <span class="label">MFR Errors</span>
-        <span class="value">{{ mfr_errors }}</span>
-    </div>
-
-    <footer
-        style="margin-top: 100px; padding-top: 20px; border-top: 1px solid var(--slate-border); display: flex; justify-content: space-between; font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">
-        <div>Kytchens Intelligence Systems &bull; Global Operations</div>
-        <div>Published: {{ published_at }}</div>
-    </footer>
 
 </body>
 
