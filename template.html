@@ -12,13 +12,14 @@
             --slate-200: #e2e8f0;
             --slate-50: #f8fafc;
             --success: #059669;
+            --danger: #ef4444;
             --white: #ffffff;
         }
 
         body {
             font-family: 'Inter', -apple-system, system-ui, sans-serif;
             margin: 0;
-            padding: 60px 50px;
+            padding: 60px 40px;
             color: var(--navy);
             background-color: var(--white);
             line-height: 1.5;
@@ -29,11 +30,11 @@
         /* 1. HERO LOGO SECTION */
         .hero-branding {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .hero-branding img {
-            max-height: 180px;
+            max-height: 160px;
             width: auto;
             display: inline-block;
         }
@@ -42,14 +43,14 @@
         .meta-container {
             border-bottom: 1px solid var(--navy);
             padding-bottom: 12px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
         }
 
         .meta-item {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -62,11 +63,11 @@
 
         /* 3. PRIMARY HEADER */
         .main-header {
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .main-header h1 {
-            font-size: 42px;
+            font-size: 38px;
             font-weight: 800;
             margin: 0;
             letter-spacing: -0.03em;
@@ -74,115 +75,75 @@
         }
 
         .main-header p {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--slate-500);
             margin: 8px 0 0 0;
             font-weight: 400;
         }
 
-        /* 4. STATISTICAL KPI GRID */
+        /* 4. PERFORMANCE GRIID */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 70px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background-color: var(--slate-50);
-            padding: 24px 20px;
+            padding: 20px;
             border-radius: 8px;
-            border-bottom: 3px solid var(--slate-200);
+            border-bottom: 2px solid var(--slate-200);
         }
 
         .stat-label {
             display: block;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
             color: var(--slate-500);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .stat-value {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             color: var(--navy);
         }
 
-        .stat-value.highlight {
+        .stat-value.success {
             color: var(--success);
         }
 
-        /* 5. DATA BREAKDOWN TABLE */
-        .table-section {
-            margin-bottom: 60px;
-        }
-
-        .section-header {
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 10px 0;
-            border-bottom: 2px solid var(--navy);
-            margin-bottom: 20px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th {
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--slate-500);
-            text-transform: uppercase;
-            padding: 15px 10px;
-            background-color: var(--slate-50);
-            border-bottom: 1px solid var(--line);
-        }
-
-        .data-table td {
-            padding: 18px 10px;
-            border-bottom: 1px solid var(--slate-200);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .benchmark-tag {
-            font-size: 11px;
-            color: var(--slate-500);
-            font-style: italic;
+        .stat-value.danger {
+            color: var(--danger);
         }
 
         /* 6. SYSTEM FOOTER */
         footer {
-            margin-top: 100px;
-            padding-top: 30px;
+            margin-top: 80px;
+            padding-top: 25px;
             border-top: 1px solid var(--slate-200);
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 9px;
             color: var(--slate-500);
             font-weight: 500;
         }
 
         .confidential {
-            color: #ef4444;
+            color: var(--danger);
             font-weight: 700;
         }
 
         @media print {
             body {
-                padding: 40px;
+                padding: 30px;
             }
 
             .stat-card {
-                border: 1px solid #ccc;
+                border: 1px solid #ddd;
             }
         }
     </style>
@@ -200,75 +161,60 @@
     <!-- METADATA BAR -->
     <div class="meta-container">
         <div class="meta-item">Operations Intelligence Portal</div>
-        <div class="meta-item meta-id">Audit ID: {{ brand[:3].upper() }}-2026-{{ range(1001, 9999) | random }}</div>
+        <div class="meta-item meta-id">Reference: {{ brand[:3].upper() }}-2026 // Audit Verified</div>
     </div>
 
     <!-- HEADER -->
     <header class="main-header">
         <h1>{{ brand }}</h1>
-        <p>{{ location }} Hub &bull; Performance Audit Update &bull; {{ date }}</p>
+        <p>{{ location }} · Operational Integrity Update · {{ date }}</p>
     </header>
 
-    <!-- KPI TILES -->
+    <!-- KPI GRID 1 -->
     <div class="stats-grid">
         <div class="stat-card">
-            <span class="stat-label">Total Volume</span>
+            <span class="stat-label">Order Volume</span>
             <span class="stat-value">{{ orders }}</span>
         </div>
         <div class="stat-card">
-            <span class="stat-label">Efficiency</span>
-            <span class="stat-value">{{ 100 - error_pct }}%</span>
+            <span class="stat-label">Efficiency Rate</span>
+            <span class="stat-value success">{{ 100 - error_pct }}%</span>
         </div>
         <div class="stat-card">
-            <span class="stat-label">Avg Prep Time</span>
+            <span class="stat-label">Average Prep Time</span>
             <span class="stat-value">{{ kpt }}m</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Category Status</span>
-            <span class="stat-value highlight">Optimal</span>
         </div>
     </div>
 
-    <!-- TABLE SECTION -->
-    <div class="table-section">
-        <div class="section-header">Detailed Operational Breakdown</div>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Domain</th>
-                    <th>KPI Description</th>
-                    <th>Metric Result</th>
-                    <th>Benchmark</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Accuracy</td>
-                    <td>Internal Kitchen Errors</td>
-                    <td>{{ kitchen_errors }}</td>
-                    <td class="benchmark-tag">&lt; 5 per cycle</td>
-                </tr>
-                <tr>
-                    <td>Logistics</td>
-                    <td>MFR Origin Cancellations</td>
-                    <td>{{ mfr_cancellations }}</td>
-                    <td class="benchmark-tag">&lt; 2 per cycle</td>
-                </tr>
-                <tr>
-                    <td>Compliance</td>
-                    <td>Registry Verification</td>
-                    <td>PASSED</td>
-                    <td class="benchmark-tag">Mandatory</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- KPI GRID 2 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Kitchen Errors</span>
+            <span class="stat-value {% if kitchen_errors > 5 %}danger{% endif %}">{{ kitchen_errors }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">MFR Cancellations</span>
+            <span class="stat-value {% if mfr_cancellations > 2 %}danger{% endif %}">{{ mfr_cancellations }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">MFR Errors</span>
+            <span class="stat-value {% if mfr_errors > 2 %}danger{% endif %}">{{ mfr_errors }}</span>
+        </div>
+    </div>
+
+    <!-- KPI GRID 3 (Status) -->
+    <div class="stats-grid">
+        <div class="stat-card" style="grid-column: span 3; background-color: var(--navy); border-bottom: none;">
+            <span class="stat-label" style="color: rgba(255,255,255,0.6);">Overall Performance Rating</span>
+            <span class="stat-value" style="color: white;">OPTIMAL // VERIFIED OPERATIONAL STANDARD</span>
+        </div>
     </div>
 
     <!-- FOOTER -->
     <footer>
         <div>Generated by Kytchens Intelligence Systems &bull; Global Operations</div>
         <div class="confidential">INTERNAL PROPERTY &bull; HIGHLY CONFIDENTIAL</div>
-        <div>Page 01 // 01</div>
+        <div>Page 1 of 1</div>
     </footer>
 
 </body>

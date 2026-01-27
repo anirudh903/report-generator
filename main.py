@@ -187,6 +187,7 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
     
     # New Fields
     mfr_can_col = find_col(['MFR Cancellations', 'Cancellations', 'MFR Can']) or 'MFR Cancellations'
+    mfr_err_col = find_col(['MFR Error', 'MFR Errors', 'MFR-Err']) or 'MFR Errors'
 
     orders = row.get(orders_col, 0) or 0
     errors = row.get(errors_col, 0) or 0
@@ -194,10 +195,11 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
     manager_email = row.get(email_col, "No email found") or "No email found"
     
     mfr_cancellations = row.get(mfr_can_col, 0) or 0
-    kitchen_errors = errors # User specified they are the same
+    mfr_errors = row.get(mfr_err_col, 0) or 0
+    kitchen_errors = errors 
 
     error_pct = round((float(errors)/float(orders))*100, 2) if float(orders) > 0 else 0
-    k_error_pct = error_pct # Since they are the same
+    k_error_pct = error_pct 
     
     # 5. RENDER PDF
     with open("template.html") as f:
@@ -211,6 +213,7 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
         kpt=kpt, 
         mfr_cancellations=mfr_cancellations,
         kitchen_errors=kitchen_errors,
+        mfr_errors=mfr_errors,
         k_error_pct=k_error_pct,
         logo_b64=logo_b64,
         date=datetime.date.today().strftime("%B %d, %Y")
