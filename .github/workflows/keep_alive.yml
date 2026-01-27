@@ -1,0 +1,23 @@
+name: Keep Streamlit Awake
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs exactly once every hour
+  workflow_dispatch:      # Allows you to click "Run" manually to test it
+
+jobs:
+  ping-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Ping Streamlit App
+        run: python heartbeat.py
