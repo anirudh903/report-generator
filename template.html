@@ -3,187 +3,229 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operational Excellence Report</title>
+    <title>Intelligence Report</title>
     <style>
-        /* System fonts provide the cleanest "Enterprise" look across devices */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@200;400;600&display=swap');
+
         :root {
-            --slate-900: #0f172a;
-            --slate-500: #64748b;
-            --slate-200: #e2e8f0;
+            --slate: #1a1a1a;
+            --muted: #888;
             --accent: #2563eb;
-            /* Sharp blue for critical data only */
-            --danger: #dc2626;
+            --warm-bg: #faf9f6;
+            /* Off-white "paper" feel */
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: white;
-            color: var(--slate-900);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--warm-bg);
+            color: var(--slate);
             margin: 0;
-            padding: 60px;
-            /* Spacious margins */
-            line-height: 1.2;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        .report-header {
+        /* Lateral Vertical Sidebar */
+        .sidebar {
+            width: 80px;
+            background-color: var(--slate);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        /* Main Content Area */
+        .main {
+            flex-grow: 1;
+            padding: 80px 100px;
+        }
+
+        header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            border-bottom: 1px solid black;
-            /* Single hairline divider */
-            padding-bottom: 12px;
-            margin-bottom: 40px;
+            align-items: flex-start;
+            margin-bottom: 80px;
         }
 
-        .report-header h1 {
-            font-size: 14px;
+        .brand-identifier img {
+            max-height: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .brand-identifier h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 64px;
             font-weight: 700;
+            line-height: 0.9;
+            margin: 0;
+            letter-spacing: -3px;
+        }
+
+        .brand-identifier p {
+            font-size: 18px;
+            font-weight: 200;
+            margin-top: 10px;
+            color: var(--muted);
+        }
+
+        /* Asymmetrical Data Section */
+        .data-layout {
+            display: flex;
+            gap: 60px;
+        }
+
+        .primary-kpi {
+            width: 40%;
+            border-top: 4px solid var(--slate);
+            padding-top: 20px;
+        }
+
+        .secondary-stats {
+            width: 60%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .hero-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 120px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 20px 0;
+            letter-spacing: -6px;
+        }
+
+        .stat-block {
+            border-left: 1px solid #ddd;
+            padding-left: 20px;
+        }
+
+        .stat-label {
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin: 0;
-        }
-
-        .metadata {
-            font-size: 11px;
-            color: var(--slate-500);
-            text-align: right;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .brand-section {
-            margin-bottom: 60px;
-        }
-
-        .brand-title {
-            font-size: 42px;
-            font-weight: 300;
-            /* Light weight for a premium feel */
-            letter-spacing: -1px;
-            margin-bottom: 8px;
-        }
-
-        .location-subtitle {
-            font-size: 16px;
-            color: var(--slate-500);
-            margin-top: 0;
-        }
-
-        /* The Minimalist Data Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            border-top: 1px solid var(--slate-200);
-            margin-top: 40px;
-        }
-
-        .kpi-box {
-            padding: 30px 0;
-            border-bottom: 1px solid var(--slate-200);
-        }
-
-        .kpi-label {
+            color: var(--muted);
+            margin-bottom: 5px;
             display: block;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--slate-500);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
         }
 
-        .kpi-value {
-            font-size: 32px;
+        .stat-value {
+            font-size: 28px;
             font-weight: 600;
-            letter-spacing: -1px;
         }
 
-        /* Color only applied to meaningful status */
-        .status-pill {
+        .tag {
             display: inline-block;
+            background: black;
+            color: white;
+            padding: 4px 10px;
             font-size: 10px;
             font-weight: 700;
-            padding: 2px 8px;
-            border: 1px solid var(--slate-900);
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
-        .alert {
-            color: var(--danger);
-        }
-
-        .footer {
+        footer {
             margin-top: 100px;
-            font-size: 10px;
-            color: var(--slate-500);
-            display: flex;
-            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
         }
 
-        /* For Print - ensures the blue accent prints correctly */
         @media print {
-            body {
-                padding: 40px;
+            .sidebar {
+                height: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
             }
 
-            * {
-                -webkit-print-color-adjust: exact;
+            .main {
+                margin-left: 80px;
+                padding: 40px 60px;
             }
-
-            print-color-adjust: exact;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="report-header">
-        <h1>Operations Intelligence</h1>
-        <div class="metadata">
-            WEEKLY REPORT / {{ date }}
-        </div>
+    <div class="sidebar">
+        <div class="vertical-text">CONFIDENTIAL 2026</div>
+        <div class="vertical-text">INTELLIGENCE UNIT</div>
     </div>
 
-    <div class="brand-section">
-        {% if logo_b64 %}
-        <img src="data:image/png;base64,{{ logo_b64 }}" style="max-height: 50px; margin-bottom: 20px; display: block;">
-        {% endif %}
-        <h2 class="brand-title">{{ brand }}</h2>
-        <p class="location-subtitle">{{ location }} · Performance Audit</p>
-    </div>
+    <div class="main">
+        <header>
+            <div class="brand-identifier">
+                {% if logo_b64 %}
+                <img src="data:image/png;base64,{{ logo_b64 }}" alt="Logo">
+                {% endif %}
+                <h1>{{ brand }}</h1>
+                <p>{{ location }} / Operational Audit</p>
+            </div>
+            <div style="text-align: right">
+                <span class="stat-label">Report Period</span>
+                <span style="font-weight: 600">{{ date }}</span>
+            </div>
+        </header>
 
-    <div class="kpi-grid">
-        <div class="kpi-box">
-            <span class="kpi-label">Order Volume</span>
-            <span class="kpi-value">{{ orders }}</span>
-        </div>
-        <div class="kpi-box">
-            <span class="kpi-label">Efficiency Rate</span>
-            <span class="kpi-value {% if error_pct > 5 %}alert{% endif %}">{{ error_pct }}%</span>
-        </div>
-        <div class="kpi-box">
-            <span class="kpi-label">Kitchen Prep Time</span>
-            <span class="kpi-value">{{ kpt }}m</span>
-        </div>
-        <div class="kpi-box">
-            <span class="kpi-label">Cancellations</span>
-            <span class="kpi-value">{{ mfr_cancellations }}</span>
-        </div>
-        <div class="kpi-box">
-            <span class="kpi-label">System Errors</span>
-            <span class="kpi-value">{{ kitchen_errors }}</span>
-        </div>
-        <div class="kpi-box">
-            <span class="kpi-label">Audit Status</span>
-            <span class="kpi-value" style="font-size: 14px;">COMPLIANT</span>
-            <div class="status-pill">VERIFIED</div>
-        </div>
-    </div>
+        <section class="data-layout">
+            <div class="primary-kpi">
+                <span class="stat-label">Efficiency Index</span>
+                <div class="hero-number">{{ 100 - error_pct }}%</div>
+                <p style="font-size: 14px; line-height: 1.6;">
+                    Overall operational accuracy remains high for this period.
+                    The brand is currently outperforming regional preparation benchmarks.
+                </p>
+                <div class="tag">TOP PERFORMER</div>
+            </div>
 
-    <div class="footer">
-        <div>KYTCHENS TECH GLOBAL OPERATIONS</div>
-        <div>CONFIDENTIAL · DATA SOURCE: GS-{{ brand[:3].upper() }}</div>
+            <div class="secondary-stats">
+                <div class="stat-block">
+                    <span class="stat-label">Volume</span>
+                    <span class="stat-value">{{ orders }} Units</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-label">Prep Time</span>
+                    <span class="stat-value">{{ kpt }}m avg</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-label">Error Count</span>
+                    <span class="stat-value" style="color: var(--accent)">{{ kitchen_errors }}</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-label">Risk Level</span>
+                    <span class="stat-value">LOW</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Kytchens Tech Global &bull; {{ brand[:3].upper() }}-00{{ range(100, 999) | random }}</span>
+                <span>Page 01 of 01</span>
+            </div>
+        </footer>
     </div>
 
 </body>
