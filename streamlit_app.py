@@ -7,7 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from main import generate_report_from_df, send_email
 
 # Page Config
-st.set_page_config(page_title="Kytchens Report Generator", page_icon="logo.jpg", layout="wide")
+st.set_page_config(page_title="Kytchens Report Generator", page_icon="page_icon.png", layout="wide")
 
 # --- Cloud Doctor: Safety Checks ---
 SECRET_CHECK = True
