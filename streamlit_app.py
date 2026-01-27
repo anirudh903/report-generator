@@ -104,12 +104,68 @@ if df is not None:
             relevant_locs = sorted([str(l).strip() for l in df[brand_mask][loc_col].unique() if l])
             location = st.selectbox("Select Location", options=relevant_locs)
                 
-        if st.button("🚀 Generate & Download Report"):
+        if st.button("🚀 Generate & Download Single Report"):
             try:
-                pdf, email = generate_report_from_df(df, brand, location)
-                st.success(f"Generated! Sent to: {email}")
-                st.download_button("📥 Download PDF", data=pdf, file_name=f"{brand}_{location}.pdf", mime="application/pdf")
-            except Exception as e: st.error(f"Error: {e}")
+                with st.spinner("Generating report..."):
+                    pdf, email = generate_report_from_df(df, brand, location)
+                    st.success(f"Generated for {brand} - {location}!")
+                    st.download_button(
+                        label="📥 Download Single PDF",
+                        data=pdf,
+                        file_name=f"{brand}_{location}_report.pdf",
+                        mime="application/pdf"
+                    )
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+
+        # --- BULK GENERATE SECTION ---
+        st.divider()
+        st.subheader("📦 Bulk Generation")
+        st.info("Click below to generate reports for **every brand and location** in the dataset. This will create a ZIP file.")
+        
+        if st.button("🗂️ Bulk Generate All Reports (ZIP)"):
+            import zipfile
+            import io
+            
+            try:
+                # Get every unique combination of Brand and Location
+                # Filter out rows where either is empty
+                combinations = df[[brand_col, loc_col]].drop_duplicates().values.tolist()
+                combinations = [c for c in combinations if str(c[0]).strip() and str(c[1]).strip()]
+                
+                zip_buffer = io.BytesIO()
+                total_reports = len(combinations)
+                
+                if total_reports == 0:
+                    st.warning("No data found to generate reports.")
+                    st.stop()
+                
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+                    for i, (b, l) in enumerate(combinations):
+                        status_text.text(f"Generating ({i+1}/{total_reports}): {b} - {l}...")
+                        try:
+                            # Use existing logic to generate the PDF
+                            pdf_data, _ = generate_report_from_df(df, str(b), str(l))
+                            # Clean filename
+                            clean_filename = f"{str(b)}_{str(l)}_report.pdf".replace("/", "-")
+                            zip_file.writestr(clean_filename, pdf_data)
+                        except Exception as e:
+                            st.warning(f"Skipped {b} - {l}: {e}")
+                        
+                        progress_bar.progress((i + 1) / total_reports)
+                
+                st.success(f"✅ Successfully generated {total_reports} reports!")
+                st.download_button(
+                    label="📥 Download All Reports (ZIP)",
+                    data=zip_buffer.getvalue(),
+                    file_name=f"All_Kytchens_Reports_{pd.Timestamp.now().strftime('%Y-%m-%d')}.zip",
+                    mime="application/zip"
+                )
+            except Exception as e:
+                st.error(f"Bulk generation failed: {e}")
     else: st.warning(f"Could not find Brand/Location columns.")
 else: st.info("Please provide a data source to begin.")
 
