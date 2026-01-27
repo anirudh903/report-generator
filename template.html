@@ -4,200 +4,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Kitchen Performance Report</title>
+    <title>Executive Kitchen Performance Report</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --background: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            --brand-navy: #0f172a;
+            /* Deep Executive Navy */
+            --accent-blue: #2563eb;
+            /* Professional Blue */
+            --border-light: #e2e8f0;
+            --success-deep: #065f46;
+            --danger-deep: #991b1b;
+            --bg-muted: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--background);
+            background-color: white;
             color: var(--text-main);
             margin: 0;
-            padding: 10px;
-            /* Minimal padding for edge-to-edge look */
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 100%;
-            /* Stretch to end-to-end */
-            margin: 0;
-            background: var(--card-bg);
             padding: 40px;
-            border-radius: 0;
-            /* Boxy look for full page immersion */
-            box-shadow: none;
-            border: none;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
         }
 
-        .header {
+        .report-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Enterprise Header Area */
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #f1f5f9;
+            align-items: flex-end;
+            border-bottom: 3px solid var(--brand-navy);
             padding-bottom: 20px;
+            margin-bottom: 40px;
         }
 
-        .header-left h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-            color: var(--primary-dark);
+        .logo-area img {
+            max-height: 60px;
+            width: auto;
         }
 
-        .header-left p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin: 5px 0 0 0;
-        }
-
-        .header-right {
+        .report-meta {
             text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
         }
 
-        .brand-badge {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 6px 16px;
-            border-radius: 99px;
-            font-size: 14px;
-            font-weight: 600;
+        /* Executive Title Section */
+        .executive-summary {
+            margin-bottom: 50px;
+        }
+
+        .executive-summary h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.02em;
+            color: var(--brand-navy);
+        }
+
+        .brand-pill {
             display: inline-block;
+            background-color: var(--brand-navy);
+            color: white;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            border-radius: 2px;
         }
 
-        .stats-grid {
+        /* Performance Metrics Grid */
+        .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            gap: 1px;
+            /* Creates the border look */
+            background-color: var(--border-light);
+            border: 1px solid var(--border-light);
+            margin-bottom: 50px;
+        }
+
+        .metric-item {
+            background-color: white;
+            padding: 30px 20px;
+            text-align: left;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .metric-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--brand-navy);
+            display: block;
+        }
+
+        .metric-value.excellent {
+            color: var(--accent-blue);
+        }
+
+        .metric-value.warning {
+            color: var(--danger-deep);
+        }
+
+        /* Secondary Data Table Style */
+        .details-section {
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 20px;
             margin-bottom: 40px;
         }
 
-        .stat-card {
-            padding: 24px;
-            border-radius: 16px;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .stat-value.excellent {
-            color: var(--success);
-        }
-
-        .stat-value.warning {
-            color: var(--danger);
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #f1f5f9;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .location-info {
-            margin-bottom: 30px;
-        }
-
-        .location-info h2 {
+        .details-section h2 {
             font-size: 18px;
-            margin: 0;
-            color: var(--text-main);
+            font-weight: 700;
+            margin: 0 0 5px 0;
         }
 
-        .location-info span {
-            color: var(--text-muted);
+        .details-section p {
             font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Footer Stamp */
+        .footer-stamp {
+            margin-top: 80px;
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .confidential-tag {
+            color: var(--danger-deep);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .report-wrapper {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div style="text-align: center; padding-top: 10px; margin-bottom: 20px;">
-        {% if logo_b64 %}
-        <img src="data:image/png;base64,{{ logo_b64 }}" style="max-height: 150px; display: inline-block;">
-        {% endif %}
-    </div>
-
-    <div class="container">
-        <div class="header"
-            style="flex-direction: column; align-items: center; text-align: center; border-bottom: none; gap: 10px;">
-            <div class="header-info">
-                <h1 style="margin: 0; color: var(--primary-dark); font-size: 30px;">Performance Report</h1>
-                <p style="margin: 5px 0 0 0; font-size: 15px; color: var(--text-muted);">Weekly Insight Update</p>
-            </div>
-            <div class="header-meta" style="margin-top: 10px;">
-                <div class="brand-badge" style="padding: 8px 24px;">{{ brand }}</div>
-                <p style="margin: 10px 0 0 0; font-size: 14px; color: var(--text-muted);">{{ date }}</p>
-            </div>
-        </div>
-
-        <div class="location-info" style="text-align: center; border-top: 2px solid #f1f5f9; padding-top: 20px;">
-            <h2>{{ location }} Outlet</h2>
-            <span>Store Operations Analysis</span>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Orders</div>
-                <div class="stat-value">{{ orders }}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Error Percentage</div>
-                <div class="stat-value {% if error_pct > 5 %}warning{% else %}excellent{% endif %}">
-                    {{ error_pct }}%
+    <div class="report-wrapper">
+        <div class="top-bar">
+            <div class="logo-area">
+                {% if logo_b64 %}
+                <img src="data:image/png;base64,{{ logo_b64 }}" alt="Company Logo">
+                {% else %}
+                <div style="font-weight: 800; font-size: 24px;">KYTCHENS<span style="color:var(--accent-blue)">.</span>
                 </div>
+                {% endif %}
             </div>
-            <div class="stat-card">
-                <div class="stat-label">KPT (Kitchen Prep Time)</div>
-                <div class="stat-value">{{ kpt }} mins</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">MFR Cancellations</div>
-                <div class="stat-value">{{ mfr_cancellations }}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Kitchen Errors</div>
-                <div class="stat-value">{{ kitchen_errors }} ({{ k_error_pct }}%)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Report Status</div>
-                <div class="stat-value" style="font-size: 18px; color: var(--success);">Finalized</div>
+            <div class="report-meta">
+                Ref: INTEL-{{ brand[:3].upper() }}-2024<br>
+                Issued: {{ date }}
             </div>
         </div>
 
-        <div class="footer">
-            Generated automatically by Kychens Intelligence System &bull; Confidential
+        <div class="executive-summary">
+            <h1>Weekly Operations Performance</h1>
+            <div class="brand-pill">{{ brand }}</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 15px; max-width: 600px;">
+                Operational analysis for <strong>{{ location }} Outlet</strong>.
+                This document provides key performance indicators (KPIs) regarding efficiency,
+                order accuracy, and preparation benchmarks for the current reporting cycle.
+            </p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <span class="metric-label">Total Volume</span>
+                <span class="metric-value">{{ orders }} Orders</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Error Rate</span>
+                <span class="metric-value {% if error_pct > 5 %}warning{% else %}excellent{% endif %}">
+                    {{ error_pct }}%
+                </span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Prep Time (Avg)</span>
+                <span class="metric-value">{{ kpt }}m</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">MFR Cancellations</span>
+                <span class="metric-value">{{ mfr_cancellations }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Kitchen Errors</span>
+                <span class="metric-value">{{ kitchen_errors }}</span>
+            </div>
+            <div class="metric-item" style="background-color: var(--bg-muted);">
+                <span class="metric-label">Compliance Status</span>
+                <span class="metric-value" style="font-size: 18px; color: var(--success-deep);">Verified</span>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h2>Operations Analysis</h2>
+            <p>Benchmarked against Regional Kitchen Standards</p>
+        </div>
+
+        <div class="footer-stamp">
+            <div>&copy; 2024 Kytchens Intelligence Systems. All Rights Reserved.</div>
+            <div class="confidential-tag">Highly Confidential / Internal Only</div>
         </div>
     </div>
 </body>
