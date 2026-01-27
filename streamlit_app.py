@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from main import generate_report_from_df
+from main import generate_report_from_df, send_email
 
 # Page Config
 st.set_page_config(page_title="Kytchens Report Generator", page_icon="🍳", layout="wide")
@@ -16,12 +16,16 @@ try:
         os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
     else:
         SECRET_CHECK = False
+    
+    # Sync Email Secrets
+    if "EMAIL_USER" in st.secrets: os.environ["EMAIL_USER"] = st.secrets["EMAIL_USER"]
+    if "EMAIL_PASS" in st.secrets: os.environ["EMAIL_PASS"] = st.secrets["EMAIL_PASS"]
 except Exception:
     SECRET_CHECK = False
 
 if not SECRET_CHECK:
     st.error("🔑 **Required Setup: Secrets Missing**")
-    st.info("Please add your API keys to the Streamlit Secrets Dashboard.")
+    st.info("Please add GEMINI_API_KEY, EMAIL_USER, and EMAIL_PASS to your Streamlit secrets.")
     st.stop()
 
 # Custom Styling
@@ -61,8 +65,6 @@ else:  # Google Sheets Mode
     
     if sheet_url:
         try:
-            # 1. Get raw creds from secrets
-            # We try both the new flattened format and the old GCP_JSON format
             if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
                 creds_dict = dict(st.secrets["connections"]["gsheets"])
             elif "GCP_JSON" in st.secrets:
@@ -71,11 +73,9 @@ else:  # Google Sheets Mode
                 st.error("GCP credentials not found in secrets.")
                 st.stop()
             
-            # 2. Fix private key formatting
             if "private_key" in creds_dict:
                 creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
             
-            # 3. Connect via gspread (More reliable than the st-gsheets-connection for some keys)
             scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
             client = gspread.authorize(creds)
@@ -86,7 +86,6 @@ else:  # Google Sheets Mode
             st.success("Connected to Google Sheets!")
         except Exception as e:
             st.error(f"Connection Failed: {e}")
-            st.info("💡 **Common Fix:** Share your sheet with: " + creds_dict.get('client_email', 'the email in your JSON'))
 
 # Report Generation
 st.divider()
@@ -104,69 +103,84 @@ if df is not None:
             relevant_locs = sorted([str(l).strip() for l in df[brand_mask][loc_col].unique() if l])
             location = st.selectbox("Select Location", options=relevant_locs)
                 
-        if st.button("🚀 Generate & Download Single Report"):
-            try:
-                with st.spinner("Generating report..."):
-                    pdf, email = generate_report_from_df(df, brand, location)
-                    st.success(f"Generated for {brand} - {location}!")
-                    st.download_button(
-                        label="📥 Download Single PDF",
-                        data=pdf,
-                        file_name=f"{brand}_{location}_report.pdf",
-                        mime="application/pdf"
-                    )
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+        col_dl, col_em = st.columns(2)
+        
+        pdf_data = None
+        email_addr = None
+        
+        with col_dl:
+            if st.button("🚀 Generate & Download Single Report"):
+                try:
+                    with st.spinner("Generating..."):
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location)
+                        st.success(f"Generated!")
+                        st.download_button(
+                            label="📥 Download PDF",
+                            data=pdf_data,
+                            file_name=f"{brand}_{location}_report.pdf",
+                            mime="application/pdf"
+                        )
+                except Exception as e: st.error(f"Error: {e}")
+        
+        with col_em:
+            if st.button("📧 Generate & Send via Email"):
+                try:
+                    with st.spinner("Sending email..."):
+                        # Always re-generate or fetch to ensure we have latest
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location)
+                        
+                        if email_addr and "@" in str(email_addr):
+                            success, msg = send_email(pdf_data, email_addr, brand)
+                            if success: st.success(msg)
+                            else: st.error(f"Email failed: {msg}")
+                        else:
+                            st.error(f"Invalid email address found: {email_addr}")
+                except Exception as e: st.error(f"Error: {e}")
 
         # --- BULK GENERATE SECTION ---
         st.divider()
-        st.subheader("📦 Bulk Generation")
-        st.info("Click below to generate reports for **every brand and location** in the dataset. This will create a ZIP file.")
+        st.subheader("📦 Bulk Processing")
         
-        if st.button("🗂️ Bulk Generate All Reports (ZIP)"):
+        col_b1, col_b2 = st.columns(2)
+        
+        if col_b1.button("🗂️ Bulk Generate All Reports (ZIP)"):
             import zipfile
             import io
-            
             try:
-                # Get every unique combination of Brand and Location
-                # Filter out rows where either is empty
                 combinations = df[[brand_col, loc_col]].drop_duplicates().values.tolist()
                 combinations = [c for c in combinations if str(c[0]).strip() and str(c[1]).strip()]
-                
                 zip_buffer = io.BytesIO()
-                total_reports = len(combinations)
-                
-                if total_reports == 0:
-                    st.warning("No data found to generate reports.")
-                    st.stop()
-                
-                progress_bar = st.progress(0)
-                status_text = st.empty()
-                
+                total = len(combinations)
+                progress = st.progress(0)
                 with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
                     for i, (b, l) in enumerate(combinations):
-                        status_text.text(f"Generating ({i+1}/{total_reports}): {b} - {l}...")
-                        try:
-                            # Use existing logic to generate the PDF
-                            pdf_data, _ = generate_report_from_df(df, str(b), str(l))
-                            # Clean filename
-                            clean_filename = f"{str(b)}_{str(l)}_report.pdf".replace("/", "-")
-                            zip_file.writestr(clean_filename, pdf_data)
-                        except Exception as e:
-                            st.warning(f"Skipped {b} - {l}: {e}")
-                        
-                        progress_bar.progress((i + 1) / total_reports)
-                
-                st.success(f"✅ Successfully generated {total_reports} reports!")
-                st.download_button(
-                    label="📥 Download All Reports (ZIP)",
-                    data=zip_buffer.getvalue(),
-                    file_name=f"All_Kytchens_Reports_{pd.Timestamp.now().strftime('%Y-%m-%d')}.zip",
-                    mime="application/zip"
-                )
-            except Exception as e:
-                st.error(f"Bulk generation failed: {e}")
+                        pdf, _ = generate_report_from_df(df, str(b), str(l))
+                        zip_file.writestr(f"{b}_{l}_report.pdf".replace("/", "-"), pdf)
+                        progress.progress((i + 1) / total)
+                st.success(f"✅ Generated {total} reports!")
+                st.download_button("📥 Download ZIP", data=zip_buffer.getvalue(), 
+                                 file_name=f"Kytchens_Reports_{pd.Timestamp.now().strftime('%Y%m%d')}.zip")
+            except Exception as e: st.error(f"Failed: {e}")
+
+        if col_b2.button("✉️ Bulk Email All Managers"):
+            try:
+                combinations = df[[brand_col, loc_col]].drop_duplicates().values.tolist()
+                combinations = [c for c in combinations if str(c[0]).strip() and str(c[1]).strip()]
+                total = len(combinations)
+                progress = st.progress(0)
+                success_count = 0
+                for i, (b, l) in enumerate(combinations):
+                    try:
+                        pdf, email = generate_report_from_df(df, str(b), str(l))
+                        if email and "@" in str(email):
+                            success, _ = send_email(pdf, email, str(b))
+                            if success: success_count += 1
+                    except: pass
+                    progress.progress((i + 1) / total)
+                st.success(f"📨 Successfully emailed {success_count} / {total} managers!")
+            except Exception as e: st.error(f"Bulk email failed: {e}")
+            
     else: st.warning(f"Could not find Brand/Location columns.")
 else: st.info("Please provide a data source to begin.")
 
-st.caption("Kychens Intelligence System v1.3")
+st.caption("Kychens Intelligence System v1.4")
