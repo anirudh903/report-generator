@@ -216,7 +216,7 @@ def generate_report_from_df(df, brand, location, logo_b64=None):
         mfr_errors=mfr_errors,
         k_error_pct=k_error_pct,
         logo_b64=logo_b64,
-        date=datetime.date.today().strftime("%B %d, %Y")
+        published_at=datetime.datetime.now().strftime("%B %d, %Y // %I:%M %p")
     )
     
     # Path detection for wkhtmltopdf (Windows and Linux)
