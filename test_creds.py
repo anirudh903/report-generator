@@ -4,8 +4,18 @@ import os
 from oauth2client.service_account import ServiceAccountCredentials
 
 try:
-    creds_json = st.secrets["GCP_JSON"]
-    creds = json.loads(creds_json)
+    # Updated to work with the flattened structure in secrets.toml
+    if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
+        creds = dict(st.secrets["connections"]["gsheets"])
+    elif "GCP_JSON" in st.secrets:
+        creds = json.loads(st.secrets["GCP_JSON"])
+    else:
+        raise KeyError("Neither connections.gsheets nor GCP_JSON found in secrets")
+
+    # Healing: Fix private key formatting if needed
+    if "private_key" in creds:
+        creds["private_key"] = creds["private_key"].replace("\\n", "\n")
+
     print("Keys in JSON:", list(creds.keys()))
     
     # Check specifically for standard keys

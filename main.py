@@ -198,11 +198,14 @@ def generate_report_from_df(df, brand, location, logo_b64=None, spreadsheet_url=
     mfr_errors = row.get(mfr_err_col, 0) or 0
     kitchen_errors = errors 
 
+    # Dynamic Spreadsheet URL: Priority 1: Specific row source, Priority 2: Fallback
+    final_spreadsheet_url = str(row.get('Source_URL', '')).strip() or str(spreadsheet_url or '').strip()
+    
     error_pct = round((float(errors)/float(orders))*100, 2) if float(orders) > 0 else 0
     k_error_pct = error_pct 
     
     # 5. RENDER PDF
-    with open("template.html") as f:
+    with open("template.html", "r", encoding="utf-8") as f:
         tmpl = Template(f.read())
     
     html_out = tmpl.render(
@@ -216,15 +219,14 @@ def generate_report_from_df(df, brand, location, logo_b64=None, spreadsheet_url=
         mfr_errors=mfr_errors,
         k_error_pct=k_error_pct,
         logo_b64=logo_b64,
-        spreadsheet_url=spreadsheet_url,
+        spreadsheet_url=final_spreadsheet_url,
         published_at=(datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30)).strftime("%B %d, %Y // %I:%M %p IST")
     )
     
-    # Path detection for wkhtmltopdf (Windows and Linux)
+    # Path detection for wkhtmltopdf
     config = None
     import shutil
     
-    # Try system PATH first
     system_path = shutil.which("wkhtmltopdf")
     if system_path:
         config = pdfkit.configuration(wkhtmltopdf=system_path)
@@ -243,20 +245,22 @@ def generate_report_from_df(df, brand, location, logo_b64=None, spreadsheet_url=
             
     options = {
         'page-size': 'A4',
-        'margin-top': '0.1in',
-        'margin-right': '0.1in',
-        'margin-bottom': '0.1in',
-        'margin-left': '0.1in',
+        'margin-top': '0in',
+        'margin-right': '0in',
+        'margin-bottom': '0in',
+        'margin-left': '0in',
         'encoding': "UTF-8",
         'enable-local-file-access': None,
-        'no-outline': None
+        'enable-external-links': None, # Critical for links to work
+        'no-outline': None,
+        'quiet': ''
     }
     
     try:
         pdf = pdfkit.from_string(html_out, False, configuration=config, options=options)
     except Exception as e:
         if "No wkhtmltopdf executable found" in str(e):
-            raise RuntimeError("PDF Error: wkhtmltopdf is not installed correctly in the cloud environment.")
+            raise RuntimeError("PDF Error: wkhtmltopdf not found.")
         raise e
         
     return pdf, manager_email

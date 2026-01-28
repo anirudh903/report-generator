@@ -50,6 +50,7 @@ st.sidebar.title("Settings")
 mode = st.sidebar.radio("Data Source", ["📁 Upload Excel/CSV", "🌐 Google Sheets"])
 
 df = None
+sheet_urls = []
 
 if mode == "📁 Upload Excel/CSV":
     uploaded_file = st.file_uploader("Choose a file", type=["xlsx", "csv"])
@@ -61,9 +62,12 @@ if mode == "📁 Upload Excel/CSV":
             st.error(f"Error: {e}")
 
 else:  # Google Sheets Mode
-    sheet_url = st.text_input("Google Sheet URL", placeholder="https://docs.google.com/spreadsheets/d/...")
+    st.info("💡 You can enter multiple Google Sheet URLs (one per line) to combine data from all of them.")
+    sheet_urls_raw = st.text_area("Google Sheet URL(s)", height=100, placeholder="https://docs.google.com/spreadsheets/d/...\nhttps://docs.google.com/spreadsheets/d/...")
     
-    if sheet_url:
+    sheet_urls = [url.strip() for url in sheet_urls_raw.split('\n') if url.strip()]
+    
+    if sheet_urls:
         try:
             if "connections" in st.secrets and "gsheets" in st.secrets["connections"]:
                 creds_dict = dict(st.secrets["connections"]["gsheets"])
@@ -80,12 +84,33 @@ else:  # Google Sheets Mode
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
             client = gspread.authorize(creds)
             
-            with st.spinner("Connecting..."):
-                sheet = client.open_by_url(sheet_url).get_worksheet(0)
-                df = pd.DataFrame(sheet.get_all_records())
-            st.success("Connected to Google Sheets!")
+            all_dfs = []
+            with st.spinner(f"Connecting to {len(sheet_urls)} sheets..."):
+                for i, url in enumerate(sheet_urls):
+                    try:
+                        sheet = client.open_by_url(url).get_worksheet(0)
+                        data = sheet.get_all_records()
+                        if data:
+                            sheet_df = pd.DataFrame(data)
+                            sheet_df['Source_URL'] = url
+                            all_dfs.append(sheet_df)
+                        else:
+                            st.warning(f"Sheet {i+1} is empty.")
+                    except Exception as sheet_err:
+                        st.error(f"Error loading sheet {i+1}: {sheet_err}")
+                
+                if all_dfs:
+                    df = pd.concat(all_dfs, ignore_index=True)
+                    st.success(f"Connected! Combined {len(all_dfs)} sheets with {len(df)} total records.")
+                    with st.expander("📊 Data Preview (Source URLs)"):
+                        st.write(df[['Brand', 'Location', 'Source_URL']].head())
+                else:
+                    st.error("No data found in any of the provided sheets.")
+
         except Exception as e:
-            st.error(f"Connection Failed: {e}")
+            st.error(f"Connection Failed: {str(e)}")
+            if "Invalid credentials" in str(e) or "invalid_grant" in str(e):
+                st.info("📋 **Solution**: Share your Google Sheet with: `service-account@n8n-local-host-485009.iam.gserviceaccount.com`")
 
 # Report Generation
 st.divider()
@@ -104,13 +129,13 @@ if df is not None:
             location = st.selectbox("Select Location", options=relevant_locs)
                 
         col_dl, col_em = st.columns(2)
-        active_url = sheet_url if mode == "🌐 Google Sheets" else None
+        fallback_url = sheet_urls[0] if (mode == "🌐 Google Sheets" and sheet_urls) else None
 
         with col_dl:
             if st.button("🚀 Generate & Download Single Report"):
                 try:
                     with st.spinner("Generating..."):
-                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=active_url)
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=fallback_url)
                         st.success(f"Generated!")
                         st.download_button(
                             label="📥 Download PDF",
@@ -118,67 +143,60 @@ if df is not None:
                             file_name=f"{brand}_{location}_report.pdf",
                             mime="application/pdf"
                         )
-                except Exception as e: st.error(f"Error: {e}")
+                except Exception as e:
+                    st.error(f"Error: {e}")
         
         with col_em:
             if st.button("📧 Generate & Send via Email"):
                 try:
                     with st.spinner("Sending email..."):
-                        # Always re-generate or fetch to ensure we have latest
-                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=active_url)
-                        
+                        pdf_data, email_addr = generate_report_from_df(df, brand, location, spreadsheet_url=fallback_url)
                         if email_addr and "@" in str(email_addr):
                             success, msg = send_email(pdf_data, email_addr, brand)
                             if success: st.success(msg)
                             else: st.error(f"Email failed: {msg}")
                         else:
                             st.error(f"Invalid email address found: {email_addr}")
-                except Exception as e: st.error(f"Error: {e}")
+                except Exception as e:
+                    st.error(f"Error: {e}")
 
-        # --- BULK GENERATE SECTION ---
+        # Bulk processing
         st.divider()
         st.subheader("📦 Bulk Processing")
-        
         col_b1, col_b2 = st.columns(2)
         
         if col_b1.button("🗂️ Bulk Generate All Reports (ZIP)"):
-            import zipfile
-            import io
+            import zipfile, io
             try:
                 combinations = df[[brand_col, loc_col]].drop_duplicates().values.tolist()
                 combinations = [c for c in combinations if str(c[0]).strip() and str(c[1]).strip()]
                 zip_buffer = io.BytesIO()
-                total = len(combinations)
                 progress = st.progress(0)
                 with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
                     for i, (b, l) in enumerate(combinations):
-                        pdf, _ = generate_report_from_df(df, str(b), str(l))
+                        pdf, _ = generate_report_from_df(df, str(b), str(l), spreadsheet_url=fallback_url)
                         zip_file.writestr(f"{b}_{l}_report.pdf".replace("/", "-"), pdf)
-                        progress.progress((i + 1) / total)
-                st.success(f"✅ Generated {total} reports!")
-                st.download_button("📥 Download ZIP", data=zip_buffer.getvalue(), 
-                                 file_name=f"Kytchens_Reports_{pd.Timestamp.now().strftime('%Y%m%d')}.zip")
+                        progress.progress((i + 1) / len(combinations))
+                st.download_button("📥 Download ZIP", data=zip_buffer.getvalue(), file_name="Reports.zip")
             except Exception as e: st.error(f"Failed: {e}")
 
         if col_b2.button("✉️ Bulk Email All Managers"):
             try:
                 combinations = df[[brand_col, loc_col]].drop_duplicates().values.tolist()
                 combinations = [c for c in combinations if str(c[0]).strip() and str(c[1]).strip()]
-                total = len(combinations)
                 progress = st.progress(0)
                 success_count = 0
                 for i, (b, l) in enumerate(combinations):
                     try:
-                        pdf, email = generate_report_from_df(df, str(b), str(l))
+                        pdf, email = generate_report_from_df(df, str(b), str(l), spreadsheet_url=fallback_url)
                         if email and "@" in str(email):
                             success, _ = send_email(pdf, email, str(b))
                             if success: success_count += 1
                     except: pass
-                    progress.progress((i + 1) / total)
-                st.success(f"📨 Successfully emailed {success_count} / {total} managers!")
-            except Exception as e: st.error(f"Bulk email failed: {e}")
+                    progress.progress((i + 1) / len(combinations))
+                st.success(f"📨 Sent {success_count} / {len(combinations)} emails!")
+            except Exception as e: st.error(f"Failed: {e}")
             
     else: st.warning(f"Could not find Brand/Location columns.")
 else: st.info("Please provide a data source to begin.")
-
-st.caption("Kychens Intelligence System v1.4")
+st.caption("Kychens Intelligence System v1.5")

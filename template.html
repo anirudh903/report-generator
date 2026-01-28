@@ -10,214 +10,232 @@
         }
 
         :root {
-            --apple-black: #1d1d1f;
             --apple-white: #ffffff;
-            --apple-gray: #f5f5f7;
-            --apple-border: #d2d2d7;
-            --apple-blue: #007aff;
-            --apple-red: #ff3b30;
-            --text-secondary: #86868b;
+            --apple-bg: #f5f5f7;
+            --apple-black: #1d1d1f;
+            --apple-gray: #86868b;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--apple-white);
             color: var(--apple-black);
             margin: 0;
-            padding: 60px 50px;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            padding: 40px;
         }
 
-        /* --- LOGO SECTION --- */
-        .hero-branding {
-            text-align: center;
+        .header-table {
+            width: 100%;
             margin-bottom: 40px;
+            border-collapse: collapse;
         }
 
-        .hero-branding img {
-            max-height: 120px;
-            width: auto;
-            display: inline-block;
+        .logo-area {
+            vertical-align: top;
+            width: 50%;
         }
 
-        .header {
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .hero-logo {
+            max-height: 80px;
+            max-width: 250px;
+            display: block;
+        }
+
+        .brand-action-area {
+            text-align: right;
+            vertical-align: top;
+            width: 50%;
         }
 
         .brand-name {
             font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            margin: 0;
         }
 
-        .timestamp {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        /* --- THE BENTO STACK --- */
-        .bento-stack {
-            border: 1.5px solid var(--apple-border);
-            border-radius: 30px;
-            overflow: hidden;
-            /* Ensures internal rows respect the corner radius */
-            background: var(--apple-white);
-        }
-
-        /* PRIMARY SEGMENT (KPIs) */
-        .bento-hero {
-            background-color: var(--apple-black);
-            color: var(--apple-white);
-            padding: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .kpi-box .label {
-            color: #a1a1a6;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .kpi-box .value {
-            font-size: 52px;
-            font-weight: 700;
-            letter-spacing: -2px;
-        }
-
-        /* STANDARD SEGMENT */
-        .bento-item {
-            padding: 25px 40px;
-            border-bottom: 1px solid var(--apple-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .bento-item:last-child {
-            border-bottom: none;
-        }
-
-        .bento-item.alt {
-            background-color: var(--apple-gray);
-        }
-
-        .item-label {
+        .location-text {
             font-size: 15px;
-            font-weight: 600;
-            color: var(--apple-black);
+            color: var(--apple-gray);
+            margin: 4px 0 12px 0;
+            font-weight: 500;
         }
 
-        .item-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--apple-black);
-        }
-
-        .status-pill {
-            font-size: 11px;
-            padding: 4px 10px;
+        /* Essential for PDF Links */
+        .btn-source {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 10px 20px;
             border-radius: 20px;
+            text-decoration: none;
             font-weight: 700;
-            margin-left: 10px;
+            font-size: 12px;
+            display: inline-block;
         }
 
-        .pill-red {
-            background: #ffebeb;
-            color: var(--apple-red);
+        .pill-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 15px 0;
+            margin: 0 -15px 30px -15px;
         }
 
-        .pill-blue {
-            background: #eef7ff;
-            color: var(--apple-blue);
+        .pill-box {
+            background-color: var(--apple-bg);
+            border-radius: 30px;
+            padding: 25px 30px;
+            width: 50%;
         }
 
-        .footer {
-            margin-top: 50px;
+        .pill-box.accent {
+            background-color: var(--apple-black);
+            color: white;
+        }
+
+        .pill-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--apple-gray);
+        }
+
+        .pill-box.accent .pill-label {
+            color: #a1a1a6;
+        }
+
+        .pill-value {
+            font-size: 32px;
+            font-weight: 700;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .metric-stack {
+            background-color: var(--apple-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .metric-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .metric-row-cell {
+            padding: 22px 30px;
+            border-bottom: 1px solid #e5e5e7;
+        }
+
+        .metric-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .metric-desc {
+            font-size: 12px;
+            color: var(--apple-gray);
+            margin-top: 3px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bg-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .bg-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        footer {
+            margin-top: 60px;
             text-align: center;
             font-size: 10px;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
+            color: var(--apple-gray);
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- HERO LOGO AT THE MIDDLE TOP -->
-    {% if logo_b64 %}
-    <div class="hero-branding">
-        <img src="data:image/png;base64,{{ logo_b64 }}" alt="Enterprise Logo">
-    </div>
-    {% endif %}
-
-    <div class="header">
-        <div class="brand-name">{{ brand }} // {{ location }}</div>
-        <div class="timestamp">Period: {{ published_at }}</div>
-        {% if spreadsheet_url %}<a href="{{ spreadsheet_url }}"
-            style="font-size:10px; color: var(--apple-blue); text-decoration:none; margin-left:10px;">(View
-            Spreadsheet)</a>{% endif %}
-    </div>
-
-    <div class="bento-stack">
-        <div class="bento-hero">
-            <div class="kpi-box">
-                <span class="label">Total Orders</span>
-                <span class="value">{{ orders }}</span>
-            </div>
-            <div class="kpi-box" style="text-align: right;">
-                <span class="label">Efficiency</span>
-                <span class="value">{{ 100 - error_pct }}%</span>
-            </div>
-        </div>
-
-        <div class="bento-item">
-            <span class="item-label">Average Preparation Time</span>
-            <span class="item-value">{{ kpt }}m</span>
-        </div>
-
-        <div class="bento-item alt">
-            <span class="item-label">Kitchen Accuracy Errors</span>
-            <div>
-                <span class="item-value">{{ kitchen_errors }}</span>
-                {% if kitchen_errors > 0 %}
-                <span class="status-pill pill-red">Action Required</span>
+    <table class="header-table">
+        <tr>
+            <td class="logo-area">
+                {% if logo_b64 %}
+                <img src="data:image/png;base64,{{ logo_b64 }}" class="hero-logo">
                 {% endif %}
-            </div>
-        </div>
+                <div
+                    style="font-size: 10px; color: var(--apple-gray); font-weight: 700; margin-top: 15px; text-transform: uppercase;">
+                    Audit Generated: {{ published_at }}
+                </div>
+            </td>
+            <td class="brand-action-area">
+                <h2 class="brand-name">{{ brand }}</h2>
+                <p class="location-text">{{ location }}</p>
+                {% if spreadsheet_url and spreadsheet_url != '' %}
+                <a href="{{ spreadsheet_url }}" class="btn-source">VIEW SPREADSHEET ↗</a>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
 
-        <div class="bento-item">
-            <span class="item-label">Store Cancellations (MFR)</span>
-            <div>
-                <span class="item-value">{{ mfr_cancellations }}</span>
-                {% if spreadsheet_url %}<a href="{{ spreadsheet_url }}"
-                    style="font-size: 11px; margin-left: 10px; color: var(--apple-blue); text-decoration: none;">(View)</a>{%
-                endif %}
-            </div>
-        </div>
+    <table class="pill-table">
+        <tr>
+            <td class="pill-box accent">
+                <span class="pill-label">Total Orders</span>
+                <span class="pill-value">{{ orders }}</span>
+            </td>
+            <td class="pill-box">
+                <span class="pill-label">Avg Prep Time</span>
+                <span class="pill-value">{{ kpt }}m</span>
+            </td>
+        </tr>
+    </table>
 
-        <div class="bento-item alt">
-            <span class="item-label">Total System Exceptions</span>
-            <div>
-                <span class="item-value">{{ mfr_errors }}</span>
-                <span class="status-pill pill-blue">Logged</span>
-            </div>
-        </div>
+    <div
+        style="font-size: 11px; font-weight: 800; color: var(--apple-gray); margin: 0 0 15px 15px; text-transform: uppercase;">
+        Operational Health
     </div>
 
-    <div class="footer">
-        PROPRIETARY DATA • KYTCHENS INTELLIGENCE UNIT • AUDIT REF: {{ brand[:3].upper() }}-26
+    <div class="metric-stack">
+        <table class="metric-table">
+            <tr>
+                <td class="metric-row-cell">
+                    <div class="metric-title">Kitchen Accuracy</div>
+                    <div class="metric-desc">Preparation and assembly errors.</div>
+                </td>
+                <td class="metric-row-cell" style="text-align: right;">
+                    <span style="font-weight: 700; font-size: 20px; margin-right: 15px;">{{ kitchen_errors }}</span>
+                    <span class="badge {% if kitchen_errors > 0 %}bg-red{% else %}bg-green{% endif %}">
+                        {% if kitchen_errors > 0 %}ATTENTION{% else %}OPTIMAL{% endif %}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="metric-row-cell" style="border-bottom: none;">
+                    <div class="metric-title">System Exceptions</div>
+                    <div class="metric-desc">Automated software and hardware logs.</div>
+                </td>
+                <td class="metric-row-cell" style="text-align: right; border-bottom: none;">
+                    <span style="font-weight: 700; font-size: 20px; margin-right: 15px;">{{ mfr_errors }}</span>
+                    <span class="badge bg-green">STABLE</span>
+                </td>
+            </tr>
+        </table>
     </div>
+
+    <footer>
+        Confidential Operations Audit • Kytchens Intelligence
+    </footer>
 
 </body>
 
