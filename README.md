@@ -4,6 +4,22 @@ A professional, AI-powered kitchen performance reporting system built with **Str
 
 ![Kytchens Logo](streamlit_logo.png)
 
+## 📊 System Workflow
+```mermaid
+graph TD
+    A[Google Sheets] -->|Multiple URLs| B(Streamlit App)
+    C[Service Account JSON] -->|Auth| A
+    B -->|Fetch & Combine Data| D{Data Processor}
+    D -->|Row Matching| E[Selected Brand/Location]
+    E -->|Analyze| F[Gemini AI]
+    E -->|Render HTML| G[Template.html]
+    F --> G
+    G -->|PDF Kit| H[PDF Report]
+    H -->|Click Link| A
+    H -->|Download| I[User]
+    H -->|Email| J[Manager]
+```
+
 ## 🌟 Key Features
 - **🌐 Multi-Sheet Sync**: Connect to multiple Google Sheets simultaneously and combine data in real-time.
 - **🍎 Apple-Style Design**: Beautiful, pill-style PDF reports optimized for mobile and desktop viewing.
